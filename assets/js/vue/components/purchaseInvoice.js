@@ -57,7 +57,6 @@ const purchaseInvoice = Vue.component("purchase-invoice", {
                                     <td>{{ product.PurchaseDetails_Discount }}</td>
                                     <td align="right">{{ product.PurchaseDetails_TotalAmount }}</td>
                                 </tr>
-
                                 <tr> 
                                 <td></td>
                                 <td>Total : </td>
@@ -212,7 +211,7 @@ const purchaseInvoice = Vue.component("purchase-invoice", {
                 }
                 div[_d9283dsc]{
                     padding-bottom:25px;
-                    border-bottom: 1px solid #ccc;
+                    border-bottom: 1px solid #484848;
                     margin-bottom: 15px;
                 }
                 table[_a584de]{
@@ -224,7 +223,7 @@ const purchaseInvoice = Vue.component("purchase-invoice", {
                 }
                 table[_a584de] td{
                     padding: 3px;
-                    border: 1px solid #ccc;
+                    border: 1px solid #484848;
                 }
                 table[_t92sadbc2]{
                     width: 100%;
@@ -382,7 +381,7 @@ const purchaseInvoice = Vue.component("purchase-invoice", {
                             </div>
                         </div>
                     </div>
-                    <div class="container" style="position:fixed;bottom:15px;width:100%;">
+                    <div class="container" style="position:sticky-bottom;bottom:15px;width:100%;margin-top:50px;">
                         <div class="row" style="border-bottom:1px solid #ccc;margin-bottom:5px;padding-bottom:6px;">
                             <div class="col-xs-6">
                                 <span style="text-decoration:overline;">Received by</span><br><br>

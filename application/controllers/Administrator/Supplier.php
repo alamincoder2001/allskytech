@@ -472,7 +472,7 @@ class Supplier extends CI_Controller
         $payments = $this->db->query("
         select
             'a' as sequence,
-            pm.reference as reference,
+            '' as reference,
 
             pm.PurchaseMaster_SlNo as id,
             pm.PurchaseMaster_OrderDate date,

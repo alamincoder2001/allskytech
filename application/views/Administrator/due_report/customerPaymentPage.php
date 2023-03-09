@@ -320,11 +320,11 @@ new Vue({
     },
     methods: {
         async getCustomerPayments() {
-            let data = {
-                dateFrom: this.payment.CPayment_date,
-                dateTo: this.payment.CPayment_date
-            }
-            await axios.post('/get_customer_payments', data).then(res => {
+            // let data = {
+            //     dateFrom: this.payment.CPayment_date,
+            //     dateTo: this.payment.CPayment_date
+            // }
+            await axios.post('/get_customer_payments', {data: ''}).then(res => {
                 this.payments = res.data;
             })
         },

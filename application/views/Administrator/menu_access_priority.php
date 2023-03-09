@@ -177,16 +177,10 @@
                 <input type="checkbox" id="hrPayroll" class="group-head" @click="onClickGroupHeads"> <strong>HR &
                     Payroll</strong>
                 <ul ref="hrPayroll">
-                    <li><input type="checkbox" class="access" value="dailyattendence" v-model="access"> Daily Attendence
-                    </li>
-                    <li><input type="checkbox" class="access" value="pending_attendence" v-model="access"> Pending
-                        Attendence
-                    </li>
-                    <li><input type="checkbox" class="access" value="attendence_record" v-model="access"> Attendence
-                        Record
-                    </li>
                     <li><input type="checkbox" class="access" value="salarypayment" v-model="access"> Salary Payment
                     <li><input type="checkbox" class="access" value="commission_payment" v-model="access"> Commission Payment
+                    </li>
+                    <li><input type="checkbox" class="access" value="emp_commission_report" v-model="access"> Commission Report
                     </li>
                     <li><input type="checkbox" class="access" value="employee" v-model="access"> Add Employee</li>
                     <li><input type="checkbox" class="access" value="emplists" v-model="access"> Employee List</li>
@@ -195,7 +189,6 @@
                     <li><input type="checkbox" class="access" value="month" v-model="access"> Add Month</li>
                     <li><input type="checkbox" class="access" value="employeesalaryreport" v-model="access"> Employee
                         Payment Report</li>
-                    <li><input type="checkbox" class="access" value="leave_entry" v-model="access"> Leave Entry </li>
                 </ul>
             </div>
         </div>

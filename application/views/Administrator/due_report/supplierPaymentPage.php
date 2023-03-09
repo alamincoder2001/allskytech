@@ -88,13 +88,11 @@
 								</select>
 							</div>
 						</div>
-						<div class="form-group" style="display:none;"
-							v-bind:style="{display: payment.SPayment_Paymentby == 'bank' ? '' : 'none'}">
+						<div class="form-group" style="display:none;" v-bind:style="{display: payment.SPayment_Paymentby == 'bank' ? '' : 'none'}">
 							<label class="col-md-4 control-label">Bank Account</label>
 							<label class="col-md-1">:</label>
 							<div class="col-md-7">
-								<v-select v-bind:options="filteredAccounts" v-model="selectedAccount"
-									label="display_text" placeholder="Select account"></v-select>
+								<v-select v-bind:options="filteredAccounts" v-model="selectedAccount" label="display_text" placeholder="Select account"></v-select>
 							</div>
 						</div>
 						<div class="form-group">
@@ -102,8 +100,7 @@
 							<label class="col-md-1">:</label>
 							<div class="col-md-6">
 								<select class="form-control" v-if="suppliers.length == 0"></select>
-								<v-select v-bind:options="suppliers" v-model="selectedSupplier" label="display_name"
-									@input="getSupplierDue" v-if="suppliers.length > 0"></v-select>
+								<v-select v-bind:options="suppliers" v-model="selectedSupplier" label="display_name" @input="getSupplierDue" v-if="suppliers.length > 0"></v-select>
 							</div>
 							<div class="col-md-1" style="padding-left:0;margin-left: -3px;">
 								<a href="/supplier" target="_blank" class="add-button"><i class="fa fa-plus"></i></a>
@@ -123,9 +120,7 @@
 							<label class="col-md-4 control-label">Payment Date</label>
 							<label class="col-md-1">:</label>
 							<div class="col-md-7">
-								<input type="date" class="form-control" v-model="payment.SPayment_date" required
-									@change="getSupplierPayments"
-									<?php echo $this->session->userdata('accountType') == 'u' ? 'readonly': '' ?>>
+								<input type="date" class="form-control" v-model="payment.SPayment_date" required @change="getSupplierPayments" <?php echo $this->session->userdata('accountType') == 'u' ? 'readonly' : '' ?>>
 							</div>
 						</div>
 						<div class="form-group">
@@ -175,14 +170,14 @@
 							<td>{{ row.SPayment_notes }}</td>
 							<td>{{ row.SPayment_Addby }}</td>
 							<td>
-								<?php if($this->session->userdata('accountType') != 'u'){?>
-								<button type="button" class="button edit" @click="editPayment(row)">
-									<i class="fa fa-pencil"></i>
-								</button>
-								<button type="button" class="button" @click="deletePayment(row.SPayment_id)">
-									<i class="fa fa-trash"></i>
-								</button>
-								<?php }?>
+								<?php if ($this->session->userdata('accountType') != 'u') { ?>
+									<button type="button" class="button edit" @click="editPayment(row)">
+										<i class="fa fa-pencil"></i>
+									</button>
+									<button type="button" class="button" @click="deletePayment(row.SPayment_id)">
+										<i class="fa fa-trash"></i>
+									</button>
+								<?php } ?>
 							</td>
 						</tr>
 					</template>
@@ -194,11 +189,11 @@
 	</div>
 </div>
 
-<script src="<?php echo base_url();?>assets/js/vue/vue.min.js"></script>
-<script src="<?php echo base_url();?>assets/js/vue/axios.min.js"></script>
-<script src="<?php echo base_url();?>assets/js/vue/vuejs-datatable.js"></script>
-<script src="<?php echo base_url();?>assets/js/vue/vue-select.min.js"></script>
-<script src="<?php echo base_url();?>assets/js/moment.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/vue.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/axios.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/vuejs-datatable.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/vue-select.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/moment.min.js"></script>
 
 <script>
 	Vue.component('v-select', VueSelect.VueSelect);
@@ -294,11 +289,11 @@
 		},
 		methods: {
 			getSupplierPayments() {
-				let data = {
-					dateFrom: this.payment.SPayment_date,
-					dateTo: this.payment.SPayment_date
-				}
-				axios.post('/get_supplier_payments', data).then(res => {
+				// let data = {
+				// 	dateFrom: this.payment.SPayment_date,
+				// 	dateTo: this.payment.SPayment_date
+				// }
+				axios.post('/get_supplier_payments', {data: ""}).then(res => {
 					this.payments = res.data;
 				})
 			},

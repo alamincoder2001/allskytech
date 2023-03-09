@@ -210,7 +210,7 @@ const salesInvoice = Vue.component("sales-invoice", {
                 }
                 div[_d9283dsc]{
                     padding-bottom:25px;
-                    border-bottom: 1px solid #ccc;
+                    border-bottom: 1px solid #484848;
                     margin-bottom: 15px;
                 }
                 table[_a584de]{
@@ -222,7 +222,7 @@ const salesInvoice = Vue.component("sales-invoice", {
                 }
                 table[_a584de] td{
                     padding: 3px;
-                    border: 1px solid #ccc;
+                    border: 1px solid #484848;
                 }
                 table[_t92sadbc2]{
                     width: 100%;

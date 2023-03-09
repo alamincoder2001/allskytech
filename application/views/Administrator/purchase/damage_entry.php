@@ -138,6 +138,7 @@
                             <td>{{ row.Damage_Date }}</td>
                             <td>{{ row.Product_Code }}</td>
                             <td>{{ row.Product_Name }}</td>
+                            <td>{{row.damageSerial.ps_imei_number}}</td>
                             <td>{{ row.DamageDetails_DamageQuantity }}</td>
                             <td>{{ row.damage_amount }}</td>
                             <td>{{ row.Damage_Description }}</td>
@@ -215,6 +216,11 @@
                     {
                         label: 'Product Name',
                         field: 'Product_Name',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Product Serial',
+                        field: 'damageSerial.ps_imei_number',
                         align: 'center'
                     },
                     {

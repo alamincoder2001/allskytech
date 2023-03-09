@@ -1068,13 +1068,13 @@ class Purchase extends CI_Controller
             $damageId = $this->db->insert_id();
 
             $damageDetails = array(
-                'Damage_SlNo' => $damageId,
-                'Product_SlNo' => $data->Product_SlNo,
+                'Damage_SlNo'                  => $damageId,
+                'Product_SlNo'                 => $data->Product_SlNo,
                 'DamageDetails_DamageQuantity' => $data->DamageDetails_DamageQuantity,
-                'damage_amount' => $data->damage_amount,
-                'status' => 'a',
-                'AddBy' => $this->session->userdata("FullName"),
-                'AddTime' => date('Y-m-d H:i:s')
+                'damage_amount'                => $data->damage_amount,
+                'status'                       => 'a',
+                'AddBy'                        => $this->session->userdata("FullName"),
+                'AddTime'                      => date('Y-m-d H:i:s')
             );
 
             $this->db->insert('tbl_damagedetails', $damageDetails);
@@ -1101,11 +1101,11 @@ class Purchase extends CI_Controller
             $damageId = $data->Damage_SlNo;
 
             $damage = array(
-                'Damage_InvoiceNo' => $data->Damage_InvoiceNo,
-                'Damage_Date' => $data->Damage_Date,
+                'Damage_InvoiceNo'   => $data->Damage_InvoiceNo,
+                'Damage_Date'        => $data->Damage_Date,
                 'Damage_Description' => $data->Damage_Description,
-                'UpdateBy' => $this->session->userdata("FullName"),
-                'UpdateTime' => date('Y-m-d H:i:s')
+                'UpdateBy'           => $this->session->userdata("FullName"),
+                'UpdateTime'         => date('Y-m-d H:i:s')
             );
 
             $this->db->where('Damage_SlNo', $damageId)->update('tbl_damage', $damage);
@@ -1120,11 +1120,11 @@ class Purchase extends CI_Controller
             ", [$oldProduct->DamageDetails_DamageQuantity, $oldProduct->Product_SlNo, $this->session->userdata('BRANCHid')]);
 
             $damageDetails = array(
-                'Product_SlNo' => $data->Product_SlNo,
+                'Product_SlNo'                 => $data->Product_SlNo,
                 'DamageDetails_DamageQuantity' => $data->DamageDetails_DamageQuantity,
-                'damage_amount' => $data->damage_amount,
-                'UpdateBy' => $this->session->userdata("FullName"),
-                'UpdateTime' => date('Y-m-d H:i:s')
+                'damage_amount'                => $data->damage_amount,
+                'UpdateBy'                     => $this->session->userdata("FullName"),
+                'UpdateTime'                   => date('Y-m-d H:i:s')
             );
 
             $this->db->where('Damage_SlNo', $damageId)->update('tbl_damagedetails', $damageDetails);
