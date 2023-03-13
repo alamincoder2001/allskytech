@@ -34,7 +34,7 @@ const purchaseInvoice = Vue.component("purchase-invoice", {
                 </div>
                 <div class="row">
                     <div class="col-xs-12">
-                        <table _a584de>
+                        <table _a584de class="report">
                             <thead>
                                 <tr>
                                     <td>Sl.</td>

@@ -40,7 +40,7 @@ const salesInvoice = Vue.component("sales-invoice", {
                                 <tr>
                                     <td>Sl.</td>
                                     <td>Description</td>
-                                    <td>G / W</td>
+                                    <td style="width:10%;">G / W</td>
                                     <td>Qnty</td>
                                     <td>Unit Price</td>
                                     <td>Discount</td>
@@ -92,7 +92,7 @@ const salesInvoice = Vue.component("sales-invoice", {
                                 <td style="text-align:right">{{ sales.SaleMaster_DueAmount == null ? '0.00' : sales.SaleMaster_DueAmount  }}</td>
                             </tr>
                             <tr>
-                                <td colspan="2" style="border-bottom: 1px solid #ccc;"></td>
+                                <td colspan="2" style="border-bottom: 1px solid #484848;"></td>
                             </tr>
                             <tr>
                                 <td><strong>Total Due:</strong></td>
@@ -119,7 +119,7 @@ const salesInvoice = Vue.component("sales-invoice", {
                                 <td><strong>Transport Cost:</strong></td>
                                 <td style="text-align:right">{{ sales.SaleMaster_Freight }}</td>
                             </tr>
-                            <tr><td colspan="2" style="border-bottom: 1px solid #ccc"></td></tr>
+                            <tr><td colspan="2" style="border-bottom: 1px solid #484848"></td></tr>
                             <tr>
                                 <td><strong>Total:</strong></td>
                                 <td style="text-align:right">{{ sales.SaleMaster_TotalSaleAmount }}</td>
@@ -128,7 +128,7 @@ const salesInvoice = Vue.component("sales-invoice", {
                                 <td><strong>Paid:</strong></td>
                                 <td style="text-align:right">{{ sales.SaleMaster_PaidAmount }}</td>
                             </tr>
-                            <tr><td colspan="2" style="border-bottom: 1px solid #ccc"></td></tr>
+                            <tr><td colspan="2" style="border-bottom: 1px solid #484848"></td></tr>
                             <tr>
                                 <td><strong>Due:</strong></td>
                                 <td style="text-align:right">{{ sales.SaleMaster_DueAmount }}</td>
@@ -476,8 +476,8 @@ const salesInvoice = Vue.component("sales-invoice", {
                                 </div>
                             </div>
                         </div>
-                        <div class="container" style="position:fixed;bottom:15px;width:100%;">
-                            <div class="row" style="border-bottom:1px solid #ccc;margin-bottom:5px;padding-bottom:6px;">
+                        <div class="container" style="position:sticky-top;bottom:15px;width:100%;margin-top:50px;">
+                            <div class="row" style="border-bottom:1px solid #484848;margin-bottom:5px;padding-bottom:6px;">
                                 <div class="col-xs-6">
                                     <span style="text-decoration:overline;">Received by</span><br><br>
                                 </div>
