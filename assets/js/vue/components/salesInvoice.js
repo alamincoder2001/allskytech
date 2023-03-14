@@ -430,44 +430,44 @@ const salesInvoice = Vue.component("sales-invoice", {
 				`);
       } else {
         printWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                        <title>Invoice</title>
-                        <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-                        <style>
-                            body, table{
-                                font-size: 13px;
-                                margin:0px auto !important;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-xs-2" style="margin-top:-10px;">
-                                  <img src="/uploads/company_profile_thum/${
-                                    this.currentBranch.Company_Logo_thum
-                                  }" alt="Logo" style="height:110px;" />
-                                </div>
-                                <div class="col-xs-10" style="padding-top:0px;">
-                                    <span style="font-size:18px;">AALL SKY TECH LTD</span><br>
-                                    <span style="font-size:18px;">${
-                                      this.currentBranch.Company_Name
-                                    }</span><br>
-                                    <p style="white-space:pre-line;">${
-                                      this.currentBranch.Repot_Heading
-                                    }</p>
-                                </div>
+                <!DOCTYPE html>
+                <html lang="en">
+                  <head>
+                      <meta charset="UTF-8">
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                      <title>Invoice</title>
+                      <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+                      <style>
+                          body, table{
+                              font-size: 13px;
+                              margin:0px auto !important;
+                          }
+                      </style>
+                  </head>
+                  <body>
+                      <div class="container">
+                        <div class="row">
+                            <div class="col-xs-2" style="margin-top:-10px;">
+                              <img src="/uploads/company_profile_thum/${
+                                this.currentBranch.Company_Logo_thum
+                              }" alt="Logo" style="height:110px;" />
                             </div>
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <div style="border-bottom: 4px double #454545;margin-top:7px;margin-bottom:7px;"></div>
-                                </div>
+                            <div class="col-xs-10" style="padding-top:0px;">
+                                <span style="font-size:18px;">AALL SKY TECH LTD</span><br>
+                                <span style="font-size:18px;">${
+                                  this.currentBranch.Company_Name
+                                }</span><br>
+                                <p style="white-space:pre-line;">${
+                                  this.currentBranch.Repot_Heading
+                                }</p>
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div style="border-bottom: 4px double #454545;margin-top:7px;margin-bottom:7px;"></div>
+                            </div>
+                        </div>
                         </div>
                         <div class="container">
                             <div class="row">
@@ -501,7 +501,7 @@ const salesInvoice = Vue.component("sales-invoice", {
                             </div>
                         </div>
                     </body>
-                    </html>
+                </html>
 				`);
       }
       let invoiceStyle = printWindow.document.createElement("style");
