@@ -378,10 +378,6 @@ class Sales extends CI_Controller
         try {
             $data           = json_decode($this->input->raw_input_stream);
             $invoice        = $data->sales->invoiceNo;
-            $total_tk       = $data->sales->total;
-            $paid_tk        = $data->sales->paid;
-            $due_tk         = $data->sales->due;
-            $previousDue_tk = $data->sales->previousDue;
 
             $invoiceCount   = $this->db->query("select * from tbl_salesmaster where SaleMaster_InvoiceNo = ?", $invoice)->num_rows();
             if ($invoiceCount != 0) {
@@ -418,7 +414,8 @@ class Sales extends CI_Controller
                 'SaleMaster_DueAmount'           => $data->sales->due,
                 'SaleMaster_Previous_Due'        => $data->sales->previousDue,
                 'SaleMaster_Description'         => $data->sales->note,
-                // 'commission'                     => $data->sales->commission,
+                'payment_type'                   => $data->sales->payment_type,
+                'account_id'                     => $data->sales->account_id,
                 'Status'                         => 'a',
                 'is_service'                     => $data->sales->isService,
                 "AddBy"                          => $this->session->userdata("FullName"),
@@ -671,17 +668,18 @@ class Sales extends CI_Controller
             c.Customer_Address,
             c.Customer_Type,
             e.Employee_Name,
-            br.Brunch_name
+            br.Brunch_name,
+            concat(ba.account_name, '-', ba.account_number, '(', ba.bank_name, ')') as display_text
             from tbl_salesmaster sm
             left join tbl_customer c on c.Customer_SlNo = sm.SalseCustomer_IDNo
             left join tbl_employee e on e.Employee_SlNo = sm.employee_id
             left join tbl_brunch br on br.brunch_id = sm.SaleMaster_branchid
+            left join tbl_bank_accounts ba on ba.account_id = sm.account_id
             where sm.SaleMaster_branchid = '$branchId'
             and sm.Status = 'a'
             $clauses
             order by sm.SaleMaster_SlNo desc
         ")->result();
-
         foreach ($sales as $key => $value) {
             $value->commission = $this->db->query("SELECT * FROM `tbl_employee_commission` WHERE `Employee_Sl` = ?", $value->employee_id)->result();
         }

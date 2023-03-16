@@ -190,7 +190,6 @@
 
                 axios.post('/get_all_bank_transactions', this.filter)
                     .then(res => {
-                        // console.log(res);
                         this.previousBalance = res.data.previousBalance;
                         this.transactions = res.data.transactions;
                     })

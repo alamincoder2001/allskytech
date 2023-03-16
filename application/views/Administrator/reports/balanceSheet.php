@@ -283,7 +283,7 @@
 			async getSales() {
 				await axios.post('/get_sales', this.filter)
 					.then(res => {
-						this.sales = res.data.sales;
+						this.sales = res.data.sales.filter(sale => sale.payment_type == 'Cash');
 					})
 			},
 

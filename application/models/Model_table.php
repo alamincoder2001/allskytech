@@ -264,7 +264,7 @@ class Model_Table extends CI_Model
             (
                 select ifnull(sum(sm.SaleMaster_PaidAmount), 0) from tbl_salesmaster sm
                 where sm.SaleMaster_branchid= " . $this->session->userdata('BRANCHid') . "
-                and sm.Status = 'a'
+                and sm.Status = 'a' and sm.payment_type = 'Cash'
                 " . ($date == null ? "" : " and sm.SaleMaster_SaleDate < '$date'") . "
             ) as received_sales,
             (
@@ -395,6 +395,13 @@ class Model_Table extends CI_Model
             select 
                 ba.*,
                 (
+                    select ifnull(sum(sm.SaleMaster_PaidAmount), 0) from tbl_salesmaster sm
+                    where sm.SaleMaster_branchid= " . $this->session->userdata('BRANCHid') . "
+                    and sm.Status = 'a' and sm.payment_type = 'Bank'
+                    and sm.account_id = ba.account_id
+                    " . ($date == null ? "" : " and sm.SaleMaster_SaleDate < '$date'") . "
+                ) as received_sales,
+                (
                     select ifnull(sum(bt.amount), 0) from tbl_bank_transactions bt
                     where bt.account_id = ba.account_id
                     and bt.transaction_type = 'deposit'
@@ -443,7 +450,7 @@ class Model_Table extends CI_Model
                     " . ($date == null ? "" : " and sp.SPayment_date < '$date'") . "
                 ) as total_received_from_supplier,
                 (
-                    select (ba.initial_balance + total_deposit + total_received_from_customer + total_received_from_supplier) - (total_withdraw + total_paid_to_customer + total_paid_to_supplier)
+                    select (ba.initial_balance + total_deposit + total_received_from_customer + total_received_from_supplier + received_sales) - (total_withdraw + total_paid_to_customer + total_paid_to_supplier)
                 ) as balance
             from tbl_bank_accounts ba
             where ba.branch_id = " . $this->session->userdata('BRANCHid') . "

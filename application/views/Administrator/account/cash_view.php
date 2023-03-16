@@ -79,7 +79,7 @@
                 <div class="col1">
                     <i class="fa fa-dollar fa-3x"></i>
                 </div>
-                <div class="col2">
+                <div class="col2" style="font-weight: 900;">
                     <?php echo $account->account_name;?><br>
                     <?php echo $account->account_number;?><br>
                     <?php echo strlen($account->bank_name) > 20 ? substr($account->bank_name, 0, 20) . " ..." : $account->bank_name;?>

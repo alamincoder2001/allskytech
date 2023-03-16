@@ -474,7 +474,7 @@ $route['income'] = 'Administrator/Account/income';
 $route['incomeSearch'] = 'Administrator/Account/income_search';
 $route['incomePrint'] = 'Administrator/Reports/income_print';
 
-// $route['cashView'] = 'Administrator/Account/cash_view';
+
 $route['cashView'] = 'Administrator/Account/cash_view';
 $route['bank_ledger'] = 'Administrator/Account/bankLedger';
 
