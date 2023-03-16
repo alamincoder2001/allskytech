@@ -569,23 +569,9 @@
                                     <tr>
                                         <td>
                                             <div class="form-group">
-                                                <label class="col-xs-12 control-label no-padding-right total">Payment Type</label>
-                                                <div class="col-xs-12 total">
-                                                    <select style="padding: 0;" class="form-control" v-model="sales.payment_type" @change="onChangePaymentType">
-                                                        <option value="Cash">Cash</option>
-                                                        <option value="Bank">Bank</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr v-if="sales.payment_type == 'Bank'">
-                                        <td>
-                                            <div class="form-group">
-                                                <label class="col-xs-12 control-label no-padding-right total">Account Name</label>
-                                                <div class="col-xs-12 total">
-                                                    <v-select v-bind:options="filteredAccounts" v-model="selectedAccount" label="display_text" placeholder="Select account"></v-select>
+                                                <label class="col-xs-12 control-label no-padding-right paid">cashPaid</label>
+                                                <div class="col-xs-12 cashPaid">
+                                                    <input type="number" id="cashPaid" class="form-control" v-model="sales.cashPaid" v-on:input="calculateTotal" />
                                                 </div>
                                             </div>
                                         </td>
@@ -594,9 +580,20 @@
                                     <tr>
                                         <td>
                                             <div class="form-group">
-                                                <label class="col-xs-12 control-label no-padding-right paid">Paid</label>
-                                                <div class="col-xs-12 paid">
-                                                    <input type="number" id="paid" class="form-control" v-model="sales.paid" v-on:input="calculateTotal" v-bind:disabled="selectedCustomer.Customer_Type == 'G' ? true : false" />
+                                                <label class="col-xs-12 control-label no-padding-right paid">bankPaid</label>
+                                                <div class="col-xs-12 bankPaid">
+                                                    <input type="number" id="bankPaid" class="form-control" v-model="sales.bankPaid" @input="onChangeBank" />
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr v-if="sales.bankPaid > 0">
+                                        <td>
+                                            <div class="form-group">
+                                                <label class="col-xs-12 control-label no-padding-right total">Account Name</label>
+                                                <div class="col-xs-12 total">
+                                                    <v-select v-bind:options="filteredAccounts" v-model="selectedAccount" label="display_text" placeholder="Select account"></v-select>
                                                 </div>
                                             </div>
                                         </td>
@@ -666,9 +663,11 @@
                     transportCost: 0.00,
                     total: 0.00,
                     paid: 0.00,
+                    cashPaid: 0.00,
+                    bankPaid: 0.00,
                     previousDue: 0.00,
                     due: 0.00,
-                    payment_type: 'Cash',
+                    payment_type: '',
                     account_id: '',
                     isService: '<?php echo $isService; ?>',
                     note: '',
@@ -817,10 +816,11 @@
                 })
             },
 
-            onChangePaymentType(){
-                if (this.sales.payment_type == "Cash") {
+            onChangeBank(){
+                if (this.sales.bankPaid == 0) {
                     this.selectedAccount = null
                 }
+                this.calculateTotal();
             },
 
             getEmployees() {
@@ -1132,9 +1132,10 @@
                 this.sales.total = ((parseFloat(this.sales.subTotal) + parseFloat(this.sales.vat) + parseFloat(this
                     .sales.transportCost)) - parseFloat(this.sales.discount)).toFixed(2);
                 if (this.selectedCustomer.Customer_Type == 'G') {
-                    this.sales.paid = this.sales.total;
+                    this.sales.paid = (parseFloat(this.sales.cashPaid) + parseFloat(this.sales.bankPaid)).toFixed(2)
                     this.sales.due = (parseFloat(this.sales.total) - parseFloat(this.sales.paid)).toFixed(2);
                 } else {
+                    this.sales.paid = (parseFloat(this.sales.cashPaid) + parseFloat(this.sales.bankPaid)).toFixed(2)
                     this.sales.due = (parseFloat(this.sales.total) - parseFloat(this.sales.paid)).toFixed(2);
                 }
             },
