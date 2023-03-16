@@ -191,7 +191,7 @@
 		computed: {
 			totalSales() {
 				return this.sales.reduce((prev, curr) => {
-					return prev + parseFloat(curr.SaleMaster_PaidAmount)
+					return prev + parseFloat(curr.cashPaid)
 				}, 0).toFixed(2);
 			},
 			totalPurchase() {
@@ -283,7 +283,7 @@
 			async getSales() {
 				await axios.post('/get_sales', this.filter)
 					.then(res => {
-						this.sales = res.data.sales.filter(sale => sale.payment_type == 'Cash');
+						this.sales = res.data.sales.filter(sale => sale.cashPaid > 0);
 					})
 			},
 

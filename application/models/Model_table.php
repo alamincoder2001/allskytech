@@ -262,9 +262,10 @@ class Model_Table extends CI_Model
             select
             /* Received */
             (
-                select ifnull(sum(sm.SaleMaster_PaidAmount), 0) from tbl_salesmaster sm
+                select ifnull(sum(sm.cashPaid), 0) from tbl_salesmaster sm
                 where sm.SaleMaster_branchid= " . $this->session->userdata('BRANCHid') . "
-                and sm.Status = 'a' and sm.payment_type = 'Cash'
+                and sm.Status = 'a'
+                and sm.cashPaid > 0
                 " . ($date == null ? "" : " and sm.SaleMaster_SaleDate < '$date'") . "
             ) as received_sales,
             (
@@ -395,10 +396,11 @@ class Model_Table extends CI_Model
             select 
                 ba.*,
                 (
-                    select ifnull(sum(sm.SaleMaster_PaidAmount), 0) from tbl_salesmaster sm
+                    select ifnull(sum(sm.bankPaid), 0) from tbl_salesmaster sm
                     where sm.SaleMaster_branchid= " . $this->session->userdata('BRANCHid') . "
-                    and sm.Status = 'a' and sm.payment_type = 'Bank'
+                    and sm.Status = 'a'
                     and sm.account_id = ba.account_id
+                    and sm.bankPaid > 0
                     " . ($date == null ? "" : " and sm.SaleMaster_SaleDate < '$date'") . "
                 ) as received_sales,
                 (

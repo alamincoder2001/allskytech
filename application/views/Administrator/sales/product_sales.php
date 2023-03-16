@@ -671,7 +671,6 @@
                     account_id: '',
                     isService: '<?php echo $isService; ?>',
                     note: '',
-                    // commission: 0.00,
                 },
                 isSerial: 'true',
                 p_discount_percent: 0.00,
@@ -956,8 +955,6 @@
                     this.p_discount_percent = ((parseFloat(this.selectedProduct.discount) * 100) / parseFloat(this.selectedProduct.Product_SellingPrice)).toFixed(2)
                 }
 
-                console.log(this.selectedProduct.discount);
-
                 this.selectedProduct.total = ((parseFloat(this.selectedProduct.Product_SellingPrice) - parseFloat(this.selectedProduct.discount)) * parseFloat(this.selectedProduct.quantity)).toFixed(2)
             },
             onSalesTypeChange() {
@@ -1151,7 +1148,6 @@
             //     this.productTotal()
             //     this.$refs.p_d_percent.focus();
             //     // 	this.selectedProduct.total = (parseFloat(this.selectedProduct.quantity) * parseFloat(this.selectedProduct.Product_SellingPrice)).toFixed(2);
-            //     // 	console.log(this.selectedProduct.total)
 
             // },
             saveSales() {
@@ -1160,11 +1156,15 @@
                     alert('Select Customer');
                     return;
                 }
+                if (this.selectedCustomer.Customer_Type == 'G' && parseFloat(this.sales.total) != parseFloat(this.sales.paid) ) {
+                    alert('Paid Amount not equal');
+                    return;
+                }
                 if (this.cart.length == 0) {
                     alert('Cart is empty');
                     return;
                 }
-                if (this.sales.payment_type == 'Bank' && this.selectedAccount == null) {
+                if (parseFloat(this.sales.bankPaid) > 0 && this.selectedAccount == null) {
                     alert("Select Bank Account")
                     return;
                 }
@@ -1197,7 +1197,7 @@
                     cart: this.cart
                 }
 
-                if (this.sales.payment_type == "Bank") {
+                if (parseFloat(this.sales.bankPaid) > 0) {
                     this.sales.account_id = this.selectedAccount.account_id
                 }
 
@@ -1242,6 +1242,8 @@
                         this.sales.transportCost = sales.SaleMaster_Freight;
                         this.sales.total         = sales.SaleMaster_TotalSaleAmount;
                         this.sales.paid          = sales.SaleMaster_PaidAmount;
+                        this.sales.cashPaid      = sales.cashPaid;
+                        this.sales.bankPaid      = sales.bankPaid;
                         this.sales.previousDue   = sales.SaleMaster_Previous_Due;
                         this.sales.due           = sales.SaleMaster_DueAmount;
                         this.sales.payment_type  = sales.payment_type;

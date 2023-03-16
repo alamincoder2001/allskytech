@@ -1017,7 +1017,7 @@ class Account extends CI_Controller {
                     sm.account_id,
                     sm.SaleMaster_SaleDate as transaction_date,
                     'Deposit' as transaction_type,
-                    sm.SaleMaster_PaidAmount as deposit,
+                    sm.bankPaid as deposit,
                     0.00 as withdraw,
                     sm.SaleMaster_Description as note,
                     ac.account_name,
@@ -1028,7 +1028,7 @@ class Account extends CI_Controller {
                 from tbl_salesmaster sm
                 join tbl_bank_accounts ac on ac.account_id = sm.account_id
                 where sm.Status = 'a'
-                and sm.payment_type = 'Bank'
+                and sm.bankPaid > 0
                 and sm.SaleMaster_branchid = " . $this->session->userdata('BRANCHid') . "
 
                 UNION
@@ -1420,12 +1420,12 @@ class Account extends CI_Controller {
                 sm.SaleMaster_SlNo as id,
                 sm.SaleMaster_SaleDate as date,
                 concat('Sale - ', sm.SaleMaster_InvoiceNo, ' - ', c.Customer_Name, ' (', c.Customer_Code, ')', ' - Bill: ', sm.SaleMaster_TotalSaleAmount) as description,
-                sm.SaleMaster_PaidAmount as in_amount,
+                sm.cashPaid as in_amount,
                 0.00 as out_amount
             from tbl_salesmaster sm 
             join tbl_customer c on c.Customer_SlNo = sm.SalseCustomer_IDNo
             where sm.Status = 'a'
-            and sm.payment_type = 'Cash'
+            and sm.cashPaid > 0
             and sm.SaleMaster_branchid = '$this->brunch'
             and sm.SaleMaster_SaleDate between '$data->fromDate' and '$data->toDate'
             
