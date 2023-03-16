@@ -124,9 +124,17 @@ const salesInvoice = Vue.component("sales-invoice", {
                                 <td><strong>Total:</strong></td>
                                 <td style="text-align:right">{{ sales.SaleMaster_TotalSaleAmount }}</td>
                             </tr>
-                            <tr>
+                            <!--<tr>
                                 <td><strong>Paid:</strong></td>
                                 <td style="text-align:right">{{ sales.SaleMaster_PaidAmount }}</td>
+                            </tr> -->
+                            <tr v-if="sales.cashPaid > 0">
+                                <td><strong>cashPaid:</strong></td>
+                                <td style="text-align:right">{{ sales.cashPaid }}</td>
+                            </tr>
+                            <tr v-if="sales.bankPaid > 0">
+                                <td><strong>bankPaid:</strong></td>
+                                <td style="text-align:right">{{ sales.bankPaid }}</td>
                             </tr>
                             <tr><td colspan="2" style="border-bottom: 1px solid #484848"></td></tr>
                             <tr>
