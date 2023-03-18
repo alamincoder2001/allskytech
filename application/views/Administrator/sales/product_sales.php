@@ -1160,6 +1160,10 @@
                     alert('Paid Amount not equal');
                     return;
                 }
+                if (parseFloat(this.sales.total) < parseFloat(this.sales.paid)) {
+                    alert('Paid Amount does not greater than Total amount');
+                    return;
+                }
                 if (this.cart.length == 0) {
                     alert('Cart is empty');
                     return;
