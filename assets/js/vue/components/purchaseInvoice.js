@@ -348,7 +348,7 @@ const purchaseInvoice = Vue.component("purchase-invoice", {
                     <style>
                         body, table{
                             font-size: 13px;
-                        }
+                        }                      
                     </style>
                 </head>
                 <body style="position:relative;">
