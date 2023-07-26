@@ -204,7 +204,6 @@ const purchaseInvoice = Vue.component("purchase-invoice", {
                     /*background-color:#e0e0e0;*/
                     font-weight: bold;
                     font-size:15px;
-                    margin-bottom:15px;
                     padding: 5px;
                     border-top: 1px dotted #454545;
                     border-bottom: 1px dotted #454545;
@@ -352,57 +351,72 @@ const purchaseInvoice = Vue.component("purchase-invoice", {
                         }
                     </style>
                 </head>
-                <body>
+                <body style="position:relative;">
                     <div class="container">
-                        <div class="row">
-                            <div class="col-xs-2"><img src="/uploads/company_profile_thum/${
-                              this.currentBranch.Company_Logo_thum
-                            }" alt="Logo" style="height:80px;" /></div>
-                            <div class="col-xs-10" style="padding-top:20px;">
-                            <span style="font-size:18px;">AALL SKY TECH LTD</span><br>
-                                <span style="font-size:18px;">${
-                                  this.currentBranch.Company_Name
-                                }</span><br>
-                                <p style="white-space:pre-line;">${
-                                  this.currentBranch.Repot_Heading
-                                }</p>
-                            </div>
+                        <div style="position:fixed;top:0;width:100%;">
+                          <div class="row">
+                              <div class="col-xs-2"><img src="/uploads/company_profile_thum/${
+                                this.currentBranch.Company_Logo_thum
+                              }" alt="Logo" style="height:80px;" /></div>
+                              <div class="col-xs-10" style="padding-top:20px;">
+                              <span style="font-size:18px;">AALL SKY TECH LTD</span><br>
+                                  <span style="font-size:18px;">${
+                                    this.currentBranch.Company_Name
+                                  }</span><br>
+                                  <p style="white-space:pre-line;">${
+                                    this.currentBranch.Repot_Heading
+                                  }</p>
+                              </div>
+                              <div class="col-xs-12">
+                                  <div style="border-bottom: 4px double #454545;"></div>
+                              </div>
+                          </div>                     
                         </div>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <div style="border-bottom: 4px double #454545;margin-top:7px;margin-bottom:7px;"></div>
+                        <table style="width:100%;">
+                            <thead>
+                                <tr>
+                                  <td>
+                                    <div style="height:130px;"></div>
+                                  </td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                  <td style="height:500px;">
+                                      ${invoiceContent}
+                                  </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                  <td>
+                                    <div style="height:100px;"></div>
+                                  </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div style="position:absolute;bottom:0;left:0;width:100%;">
+                            <div class="row" style="border-bottom:1px solid #ccc;margin-bottom:5px;padding-bottom:6px;">
+                                <div class="col-xs-6">
+                                    <span style="text-decoration:overline;">Received by</span><br><br>
+                                    ** THANK YOU FOR YOUR BUSINESS **
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span style="text-decoration:overline;">Authorized Signature</span>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                ${invoiceContent}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container" style="position:sticky-bottom;bottom:15px;width:100%;margin-top:50px;">
-                        <div class="row" style="border-bottom:1px solid #ccc;margin-bottom:5px;padding-bottom:6px;">
-                            <div class="col-xs-6">
-                                <span style="text-decoration:overline;">Received by</span><br><br>
-                                ** THANK YOU FOR YOUR BUSINESS **
-                            </div>
-                            <div class="col-xs-6 text-right">
-                                <span style="text-decoration:overline;">Authorized Signature</span>
-                            </div>
-                        </div>
 
-                        <div class="row" style="font-size:12px;">
-                            <div class="col-xs-6">
-                                Print Date: ${moment().format(
-                                  "DD-MM-YYYY h:mm a"
-                                )}, Printed by: ${this.purchase.AddBy}
-                            </div>
-                            <div class="col-xs-6 text-right">
-                                Developed by: Link-Up Technologoy, Contact no: 01911978897
+                            <div class="row" style="font-size:12px;">
+                                <div class="col-xs-6">
+                                    Print Date: ${moment().format(
+                                      "DD-MM-YYYY h:mm a"
+                                    )}, Printed by: ${this.purchase.AddBy}
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    Developed by: Link-Up Technologoy, Contact no: 01911978897
+                                </div>
                             </div>
                         </div>
-                    </div>
                 </body>
                 </html>
             `);
