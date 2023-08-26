@@ -42,63 +42,6 @@
         margin-top: 7px;
     }
 
-    .modal-mask {
-        position: fixed;
-        z-index: 9998;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, .5);
-        display: table;
-        transition: opacity .3s ease;
-    }
-
-    .modal-wrapper {
-        display: table-cell;
-        vertical-align: middle;
-    }
-
-    .modal-container {
-        width: 450px;
-        margin: 0px auto;
-        background-color: #fff;
-        border-radius: 2px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
-        transition: all .3s ease;
-        font-family: Helvetica, Arial, sans-serif;
-    }
-
-    .modal-header {
-        padding-bottom: 0 !important;
-    }
-
-    .modal-header h3 {
-        margin-top: 0;
-        color: #42b983;
-    }
-
-    .modal-body {
-        overflow-y: auto !important;
-        height: 300px !important;
-        margin: -8px -14px -44px !important;
-    }
-
-    .modal-default-button {
-        float: right;
-    }
-
-    .serialBtn {
-        border: none;
-        font-size: 13px;
-        line-height: 0.38;
-        margin-left: 2px;
-        background-color: rgb(0 189 133) !important;
-        height: 51px;
-        padding: 18px;
-        border-radius: 4px;
-    }
-
     @media screen and (max-width:767px) {
         .mobile-full {
             width: 100% !important;
@@ -165,61 +108,6 @@
     }
 </style>
 <div id="sales" class="row">
-
-
-    <div style="display:none" id="serial-modal" v-if="" v-bind:style="{display:serialModalStatus?'block':'none'}">
-        <transition name="modal">
-            <div class="modal-mask">
-                <div class="modal-wrapper">
-                    <div class="modal-container">
-                        <div class="modal-header">
-                            <slot name="header">
-                                <h3>IMEI Number Add</h3>
-                            </slot>
-                        </div>
-                        <div class="modal-body" style="overflow: hidden; height: 100%; margin: -8px -14px -44px;">
-                            <slot name="body">
-                                <form @submit.prevent="imei_add_action">
-                                    <div class="form-group">
-                                        <div class="col-sm-12" style="display: flex;margin-bottom: 10px;">
-                                            <textarea autocomplete="off" ref="imeinumberadd" id="imei_number" name="imei_number" v-model="get_imei_number" class="form-control" placeholder="please Enter Serial Number" cols="30" rows="2"></textarea>
-                                            <input type="submit" class="btn btn-sm btn primary serialBtn" value="Add">
-                                        </div>
-                                    </div>
-                                </form>
-                            </slot>
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">SL</th>
-                                        <th scope="col">IMEI</th>
-                                        <th scope="col">Product</th>
-                                        <th scope="col">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(product, sl) in imei_cart">
-                                        <th scope="row">{{ imei_cart.length - sl }}</th>
-                                        <td>{{product.imeiNumber}}</td>
-                                        <td>{{product.Product_Name}}</td>
-                                        <td @click="remove_imei_item(product.imeiNumber)"> <span class="badge badge-danger badge-pill" style="cursor:pointer"><i class="fa fa-times"></i></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <a class="btn" @click.prevent="serialHideModal" style="background: rgb(255 0 0) !important;border: none;font-size: 16px;padding: 5px 12px;}">Close</a>
-
-                            <a class="btn" @click.prevent="serialHideModal" style="background: rgb(0 175 70) !important;border: none;font-size: 16px;padding: 5px 25px;">OK</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </transition>
-    </div>
-
-
-
     <div class="col-xs-12 col-md-12 col-lg-12" style="border-bottom:1px #ccc solid;margin-bottom:5px;">
         <div class="row formobile">
             <div class="form-group">
@@ -318,7 +206,16 @@
                             </div>
 
                             <div class="col-xs-12 col-lg-5">
-                                <div class="form-group">
+                                <div class="form-group clearfix">
+                                    <label class="control-label col-xs-4">P. Type</label>
+                                    <div class="col-xs-8">
+                                        <input type="radio" id="serial" v-model="isSerial" value="true">
+                                        <label for="serial">Serial</label>
+                                        <input style="margin-left: 20px;" id="non-serial" type="radio" v-model="isSerial" value="false">
+                                        <label for="non-serial">Non Serial</label>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="display: none;" :style="{display: isSerial == 'false' ? '' : 'none'}">
                                     <label class="col-xs-4 control-label no-padding-right"> Product </label>
                                     <div class="col-xs-7">
                                         <v-select v-bind:options="products" v-model="selectedProduct" label="display_text" id="product" v-on:input="productOnChange"></v-select>
@@ -327,32 +224,42 @@
                                         <a href="<?= base_url('product') ?>" class="btn btn-xs btn-danger" style="height: 25px; border: 0; width: 27px; margin-left: -10px;" target="_blank" title="Add New Product"><i class="fa fa-plus" aria-hidden="true" style="margin-top: 5px;"></i></a>
                                     </div>
                                 </div>
+                                <div class="form-group" style="display: none;" :style="{display: isSerial == 'true' ? '' : 'none'}">
+                                    <label class="col-xs-4 control-label no-padding-right"> Serial Number </label>
+                                    <div class="col-xs-8">
+                                        <v-select v-bind:options="IMEIStore" v-model="selectedIEMI" label="ps_imei_number" id="imei" v-on:input="onChangeIMEI" ref="imei">
+                                        </v-select>
+                                    </div>
+                                </div>
+                                <!-- <div class="form-group">
+									<label class="col-xs-3 control-label no-padding-right"> Product </label>
+									<div class="col-xs-8">
+										<v-select v-bind:options="products" v-model="selectedProduct" label="display_text" v-on:input="productOnChange"></v-select>
+									</div>
+									<div class="col-xs-1" style="padding: 0;">
+										<a href="" class="btn btn-xs btn-danger" style="height: 25px; border: 0; width: 27px; margin-left: -10px;" target="_blank" title="Add New Product"><i class="fa fa-plus" aria-hidden="true" style="margin-top: 5px;"></i></a>
+									</div>
+								</div> -->
+                                <div class="form-group" style="display: none;">
+                                    <label class="col-xs-4 control-label no-padding-right"> Brand </label>
+                                    <div class="col-xs-8">
+                                        <input type="text" id="brand" placeholder="Group" class="form-control" />
+                                    </div>
+                                </div>
 
                                 <div class="form-group">
                                     <label class="col-xs-4 control-label no-padding-right"> Sale Rate </label>
                                     <div class="col-xs-8">
-                                        <input type="number" id="salesRate" placeholder="Rate" step="0.01" class="form-control" v-model="selectedProduct.Product_SellingPrice" v-on:input="calCulateCart" />
+
+                                        <input v-if="isSerial == 'true'" type="number" id="salesRate" placeholder="Rate" step="0.01" class="form-control" v-model="selectedIEMI.Product_SellingPrice" v-on:input="calCulateCart" />
+
+                                        <input v-else type="number" id="salesRate" placeholder="Rate" step="0.01" class="form-control" v-model="selectedProduct.Product_SellingPrice" v-on:input="calCulateCart" />
                                     </div>
                                 </div>
-
-                                <div class="form-group" style="display: none;" :style="{display: selectedProduct.Is_Serial != 'true' ? '' : 'none'}">
+                                <div class="form-group">
                                     <label class="col-xs-4 control-label no-padding-right"> Quantity </label>
                                     <div class="col-xs-8">
-                                        <input type="number" step="0.01" id="quantity" placeholder="Qty" class="form-control" ref="quantity" v-model="selectedProduct.quantity" v-on:input="productTotal" autocomplete="off" v-bind:disabled="selectedProduct.Is_Serial == 'true' ? true : false" required />
-                                    </div>
-                                </div>
-
-                                <div class="form-group" style="display: none;" :style="{display: selectedProduct.Is_Serial == 'true' ? '' : 'none'}">
-                                    <label class="col-xs-4 control-label no-padding-right"> Quantity </label>
-                                    <div class="col-xs-8">
-                                        <div class="row">
-                                            <div class="col-xs-10 no-padding-right">
-                                                <input type="number" step="0.01" id="quantity" placeholder="Qty" class="form-control" ref="quantity" v-model="selectedProduct.quantity" v-on:input="productTotal" autocomplete="off" v-bind:disabled="selectedProduct.Is_Serial == 'true' ? true : false" required />
-                                            </div>
-                                            <div class="col-xs-2 no-padding-left">
-                                                <button type="button" id="show-modal" @click="serialShowModal" style="background: rgb(210, 0, 0);color: white;border: none;font-size: 15px;height: 24px;margin-left: 1px;"><i class="fa fa-plus"></i></button>
-                                            </div>
-                                        </div>
+                                        <input type="number" step="0.01" id="quantity" placeholder="Qty" class="form-control" ref="quantity" v-model="selectedProduct.quantity" v-on:input="productTotal" autocomplete="off" v-bind:disabled="isSerial == 'true' ? true : false" required />
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -364,15 +271,23 @@
                                             </div>
                                             <label class="col-xs-2 control-label no-padding-right">Taka</label>
                                             <div class="col-xs-5">
-                                                <input type="number" id="p_d_percent_taka" placeholder="Taka" ref="p_d_percent_taka" step="0.01" min="0.00" class="form-control" v-model="selectedProduct.discount" v-on:input="productTotal" />
+                                                <input v-if="isSerial == 'true'" type=" number" id="p_d_percent_taka" placeholder="Taka" ref="p_d_percent_taka" step="0.01" min="0.00" class="form-control" v-model="selectedIEMI.SaleDetails_Discount" v-on:input="productTotal" />
+                                                <input v-else type="number" id="p_d_percent_taka" placeholder="Taka" ref="p_d_percent_taka" step="0.01" min="0.00" class="form-control" v-model="selectedProduct.discount" v-on:input="productTotal" />
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="display:none">
+                                    <label class="col-xs-4 control-label no-padding-right"> Quantity </label>
+                                    <div class="col-xs-8">
+                                        <input type="number" step="0.01" id="quantity" placeholder="Qty" class="form-control" v-model="selectedIEMI.quantity" v-on:input="productTotal" autocomplete="off" value="1" />
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-xs-4 control-label no-padding-right"> Amount </label>
                                     <div class="col-xs-8">
-                                        <input type="text" placeholder="Amount" class="form-control" v-model="selectedProduct.total" readonly="" />
+                                        <input v-if="isSerial == 'true'" type="text" placeholder="Amount" class="form-control" v-model="selectedIEMI.total" readonly="" />
+                                        <input v-else type="text" placeholder="Amount" class="form-control" v-model="selectedProduct.total" readonly="" />
                                     </div>
                                 </div>
 
@@ -386,12 +301,10 @@
 
                             <div class="col-xs-2">
                                 <div style="height:90px">
-                                    <button type="submit" class="btn" style="margin-top: 28px;border: none;padding: 12px 21px;background: #007ec7 !important;">Add
-                                        to Cart</button>
+                                    <button type="submit" class="btn" style="margin-top: 28px;border: none;padding: 12px 21px;background: #007ec7 !important;">Add to Cart</button>
                                 </div>
                                 <div style="display:none" v-bind:style="{display:sales.isService == 'true' ? 'none' : ''}">
-                                    <p style="display:none;margin: 0px;text-align: center;" v-bind:style="{color: productStock > 0 ? '#02a2ff' : 'red', display: selectedProduct.Product_SlNo == '' ? 'none' : ''}">
-                                        {{ productStockText }}
+                                    <p style="display:none;margin: 0px;text-align: center;" v-bind:style="{color: productStock > 0 ? '#02a2ff' : 'red', display: selectedProduct.Product_SlNo == '' ? 'none' : ''}">{{ productStockText }}
                                     </p>
                                     <p style="display:none;;font-weight: 600;font-size: 17px;text-align: center;" v-bind:style="{color: productStock > 0 ? '#0400ff' : 'red', display: selectedProduct.Product_SlNo == '' ? 'none' : ''}">
                                         {{ productStock }} {{ selectedProduct.Unit_Name }}
@@ -429,7 +342,7 @@
                         <tr v-for="(product, sl) in cart">
                             <td>{{ sl + 1 }}</td>
                             <td v-if="product.SerialStore.length > 0">{{ product.name }}<br>
-                                ({{ product.SerialStore.map(obj => obj.imeiNumber).join(', ') }})
+                                ({{ product.SerialStore.map(obj => obj.ps_imei_number).join(', ') }})
                             </td>
                             <td v-else>{{ product.name }}</td>
                             <td>{{ product.productCode }}</td>
@@ -448,9 +361,9 @@
                         <tr style="font-weight: bold;">
                             <td colspan="2">Note</td>
                             <td colspan="2" style="text-align:right">Total Qty = {{
-                                cart.reduce((prev, cur) => { return prev + parseFloat(cur.quantity)}, 0).toFixed(2)
-                             }}</td>
-                            <td colspan="5">Total</td>
+								cart.reduce((prev, cur) => { return prev + parseFloat(cur.quantity)}, 0).toFixed(2)
+							 }}</td>
+                            <td colspan="4">Total</td>
                         </tr>
 
                         <tr>
@@ -570,34 +483,9 @@
                                     <tr>
                                         <td>
                                             <div class="form-group">
-                                                <label class="col-xs-12 control-label no-padding-right paid">Cash
-                                                    Payment</label>
-                                                <div class="col-xs-12 cashPaid">
-                                                    <input type="number" id="cashPaid" class="form-control" v-model="sales.cashPaid" v-on:input="calculateTotal" />
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <div class="form-group">
-                                                <label class="col-xs-12 control-label no-padding-right paid">Bank
-                                                    Payment</label>
-                                                <div class="col-xs-12 bankPaid">
-                                                    <input type="number" id="bankPaid" class="form-control" v-model="sales.bankPaid" @input="onChangeBank" />
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr v-if="sales.bankPaid > 0">
-                                        <td>
-                                            <div class="form-group">
-                                                <label class="col-xs-12 control-label no-padding-right total">Account
-                                                    Name</label>
-                                                <div class="col-xs-12 total">
-                                                    <v-select v-bind:options="filteredAccounts" v-model="selectedAccount" label="display_text" placeholder="Select account"></v-select>
+                                                <label class="col-xs-12 control-label no-padding-right paid">Paid</label>
+                                                <div class="col-xs-12 paid">
+                                                    <input type="number" id="paid" class="form-control" v-model="sales.paid" v-on:input="calculateTotal" v-bind:disabled="selectedCustomer.Customer_Type == 'G' ? true : false" />
                                                 </div>
                                             </div>
                                         </td>
@@ -621,7 +509,7 @@
                                         <td>
                                             <div class="form-group">
                                                 <div class="col-xs-6 due-left">
-                                                    <input type="button" class="btn btn-success btn-sm" value="Sale" v-on:click="saveSales" v-bind:disabled="saleOnProgress ? true : false" style="color: black!important;margin-top: 0px;width:100%;padding:5px;font-weight:bold;">
+                                                    <input type="button" class="btn btn-default btn-sm" value="Sale" v-on:click="saveSales" v-bind:disabled="saleOnProgress ? true : false" style="color: black!important;margin-top: 0px;width:100%;padding:5px;font-weight:bold;">
                                                 </div>
                                                 <div class="col-xs-6 due-right">
                                                     <a class="btn btn-info btn-sm" v-bind:href="`/sales/${sales.isService == 'true' ? 'service' : 'product'}`" style="color: black!important;margin-top: 0px;width:100%;padding:5px;font-weight:bold;">New
@@ -667,14 +555,11 @@
                     transportCost: 0.00,
                     total: 0.00,
                     paid: 0.00,
-                    cashPaid: 0.00,
-                    bankPaid: 0.00,
                     previousDue: 0.00,
                     due: 0.00,
-                    payment_type: '',
-                    account_id: '',
                     isService: '<?php echo $isService; ?>',
                     note: '',
+                    // commission: 0.00,
                 },
                 isSerial: 'true',
                 p_discount_percent: 0.00,
@@ -737,13 +622,7 @@
                 productStock: '',
                 saleOnProgress: false,
                 userType: '<?php echo $this->session->userdata("accountType"); ?>',
-                employeeId: '<?php echo $this->session->userdata("employee_id"); ?>',
-
-                serialModalStatus: false,
-                get_imei_number: "",
-                imei_cart: [],
-                accounts: [],
-                selectedAccount: null,
+                employeeId: '<?php echo $this->session->userdata("employee_id"); ?>'
             }
         },
         created() {
@@ -753,80 +632,85 @@
             this.getCustomers();
             this.getProducts();
             this.GetIMEIList();
-            this.getAccounts();
             if (this.sales.salesId != 0) {
                 this.getSales();
             }
         },
-        // watch: {
-        //     isSerial(value) {
-        //         if (value == 'false') {
-        //             this.selectedIEMI = {
-        //                 Product_SlNo: '',
-        //                 display_text: 'Select Product',
-        //                 Product_Name: '',
-        //                 Unit_Name: '',
-        //                 quantity: 1,
-        //                 Product_Purchase_Rate: '',
-        //                 Product_SellingPrice: 0.00,
-        //                 vat: 0.00,
+        watch: {
+            isSerial(value) {
+                if (value == 'false') {
+                    this.selectedIEMI = {
+                        Product_SlNo: '',
+                        display_text: 'Select Product',
+                        Product_Name: '',
+                        Unit_Name: '',
+                        quantity: 1,
+                        Product_Purchase_Rate: '',
+                        Product_SellingPrice: 0.00,
+                        vat: 0.00,
 
-        //                 total: 0.00,
-        //                 ps_prod_id: '',
-        //                 ps_imei_number: '',
-        //                 SaleDetails_Discount: 0,
-        //                 ProductCategory_Name: '',
-        //                 ProductCategory_ID: ''
-        //             }
-        //         } else {
-        //             this.selectedProduct = {
-        //                 Product_SlNo: '',
-        //                 display_text: 'Select Product',
-        //                 Product_Name: '',
-        //                 Unit_Name: '',
-        //                 quantity: 0,
-        //                 Product_Purchase_Rate: '',
-        //                 Product_SellingPrice: 0.00,
-        //                 vat: 0.00,
-        //                 total: 0.00
-        //             }
-        //         }
-        //         // if (this.sales.salesType == 'wholesale') {
-        //         //     this.products = this.allProducts.filter((product) => product.Product_WholesaleRate > 0 && product.Is_Serial == this.isSerial);
-        //         //     this.products.map((product) => {
-        //         //         return product.Product_SellingPrice = product.Product_WholesaleRate;
-        //         //     })
-        //         // } else {
-        //         //     this.products = this.allProducts.filter((product) => product.Is_Serial == this.isSerial);
-        //         // }
-        //         // this.products = this.allProducts.filter(p => p.Is_Serial == value);
-        //     }
-        // },
-        computed: {
-            filteredAccounts() {
-                let accounts = this.accounts.filter(account => account.status == '1');
-                return accounts.map(account => {
-                    account.display_text =
-                        `${account.account_name} - ${account.account_number} (${account.bank_name})`;
-                    return account;
-                })
-            },
+                        total: 0.00,
+                        ps_prod_id: '',
+                        ps_imei_number: '',
+                        SaleDetails_Discount: 0,
+                        ProductCategory_Name: '',
+                        ProductCategory_ID: ''
+                    }
+                } else {
+                    this.selectedProduct = {
+                        Product_SlNo: '',
+                        display_text: 'Select Product',
+                        Product_Name: '',
+                        Unit_Name: '',
+                        quantity: 0,
+                        Product_Purchase_Rate: '',
+                        Product_SellingPrice: 0.00,
+                        vat: 0.00,
+                        total: 0.00
+                    }
+                }
+                if (this.sales.salesType == 'wholesale') {
+                    this.products = this.allProducts.filter((product) => product.Product_WholesaleRate > 0 && product.Is_Serial == this.isSerial);
+                    this.products.map((product) => {
+                        return product.Product_SellingPrice = product.Product_WholesaleRate;
+                    })
+                } else {
+                    this.products = this.allProducts.filter((product) => product.Is_Serial == this.isSerial);
+                }
+                // this.products = this.allProducts.filter(p => p.Is_Serial == value);
+            }
         },
         methods: {
-            getAccounts() {
-                axios.get('/get_bank_accounts')
-                    .then(res => {
-                        this.accounts = res.data;
-                    })
+            async GetIMEIList() {
+                await axios.get('/GetIMEIList').then(res => {
+                    this.allIMEIStore = res.data;
+                    // this.IMEIStore = res.data;
+
+                    if (this.sales.salesType == 'wholesale') {
+                        this.IMEIStore = res.data.filter((product) => product.Product_WholesaleRate > 0 && product.Is_Serial == this.isSerial && product.ps_p_r_status == 'no');
+                        this.IMEIStore.map((product) => {
+                            return product.Product_SellingPrice = product.Product_WholesaleRate;
+                        })
+                    } else {
+                        this.IMEIStore = res.data.filter(p => p.ps_p_r_status == 'no');
+                    }
+                })
             },
 
-            onChangeBank() {
-                if (this.sales.bankPaid == 0) {
-                    this.selectedAccount = null
-                }
-                this.calculateTotal();
-            },
+            calCulateCart() {
+                this.productTotal()
+                // 	alert()
 
+                // if (this.selectedIEMI.Product_SlNo <= 0) {
+                //     alert("please select a product");
+                //     return false;
+                // }
+                // var numVal1 = this.selectedIEMI.Product_SellingPrice*1;
+                //          var numVal2 = this.selectedIEMI.SaleDetails_Discount/ 100;
+                //          var totalValue = numVal1- (numVal1 * numVal2)
+                // this.selectedIEMI.total  = totalValue.toFixed(2);
+                //           console.log(this.selectedIEMI.total)
+            },
             getEmployees() {
                 axios.get('/get_employees').then(res => {
                     this.employees = res.data;
@@ -863,116 +747,50 @@
                 axios.post('/get_products', {
                     isService: this.sales.isService
                 }).then(res => {
-                    this.products = res.data;
+                    this.allProducts = res.data;
+                    if (this.sales.salesType == 'wholesale') {
+                        this.products = res.data.filter((product) => product.Product_WholesaleRate > 0 && product.Is_Serial == this.isSerial);
+                        this.products.map((product) => {
+                            return product.Product_SellingPrice = product.Product_WholesaleRate;
+                        })
+                    } else {
+                        this.products = res.data.filter((product) => product.Is_Serial == this.isSerial);
+                    }
                 })
             },
-            async GetIMEIList() {
-                await axios.get('/GetIMEIList').then(res => {
-                    this.IMEIStore = res.data;
-                })
-            },
-            serialShowModal() {
-                this.serialModalStatus = true;
-            },
-            serialHideModal() {
-                this.serialModalStatus = false;
+            productTotal() {
+                // console.log(this.selectedProduct);
 
-                this.selectedProduct.quantity = this.imei_cart.length
-                this.selectedProduct.total = (this.selectedProduct.quantity * this.selectedProduct
-                    .Product_Purchase_Rate).toFixed(2)
-                this.productTotal()
-                this.calculateTotal();
-            },
-            async imei_add_action() {
-                let duplicate = "";
-                if (this.selectedProduct.Product_SlNo == '') {
-                    alert("Please select a product");
-                    return false;
-                } else {
-
-                    if (this.get_imei_number.trim() == '') {
-                        alert("IMEI Number is Required.");
-                        return false;
-                    }
-
-                    var lines = this.get_imei_number.split(/\n/);
-                    var output = [];
-                    for (var i = 0; i < lines.length; i++) {
-                        if (/\S/.test(lines[i])) {
-                            output.push($.trim(lines[i]));
-                        }
-                    }
-
-                    // console.log(output);
-                    for (let index = 0; index < output.length; index++) {
-
-                        let imeiObj = this.IMEIStore.find(obj => obj.ps_imei_number == output[index] && obj.ps_prod_id == this.selectedProduct.Product_SlNo);
-
-
-                        let cartInd = this.imei_cart.findIndex(p => p.imeiNumber == output[index].trim());
-                        if (cartInd > -1) {
-                            // alert('IMEI Number already exists in IMEI List');
-                            duplicate = duplicate.concat(output[index].trim() + ' (Duplicate)\n')
-                            // return false;
-                        } else {
-
-                            if (!imeiObj) {
-                                duplicate = duplicate.concat(output[index].trim() + ' (Not found)\n')
-                                // alert(output[index] + ' not found in the IMEI List')
-                            } else {
-
-                                let imei_cart_obj = {
-                                    ps_id: imeiObj.ps_id,
-                                    imeiNumber: imeiObj.ps_imei_number,
-                                    Product_SlNo: imeiObj.Product_SlNo,
-                                    Product_Name: imeiObj.Product_Name,
-                                }
-                                this.imei_cart.unshift(imei_cart_obj);
-                            }
-                        }
-                    }
-
-                    console.log(duplicate);
-
-                    this.selectedProduct.quantity = output.length;
-                    this.selectedProduct.total = (this.selectedProduct.quantity * this.selectedProduct
-                        .Product_SellingPrice).toFixed(2)
-                    this.get_imei_number = duplicate;
-                }
-            },
-            async remove_imei_item(imeiNumber) {
-                var newImeiCart = this.imei_cart.filter((el) => {
-                    return el.imeiNumber != imeiNumber;
-                });
-                this.imei_cart = newImeiCart;
-            },
-            calCulateCart() {
-                this.productTotal()
-                //  alert()
-
-                // if (this.selectedIEMI.Product_SlNo <= 0) {
-                //     alert("please select a product");
-                //     return false;
+                // if (event.target.id == 'p_d_percent') {
+                //     this.selectedIEMI.SaleDetails_Discount = (parseFloat(this.selectedIEMI.Product_SellingPrice) * (parseFloat(this.selectedIEMI.SaleDetails_Discount_percent) / 100)).toFixed(2);
+                // } else {
+                //     this.selectedIEMI.SaleDetails_Discount_percent = ((parseFloat(this.selectedIEMI.SaleDetails_Discount) * 100) / parseFloat(this.selectedIEMI.Product_SellingPrice)).toFixed(2)
                 // }
-                // var numVal1 = this.selectedIEMI.Product_SellingPrice*1;
-                //          var numVal2 = this.selectedIEMI.SaleDetails_Discount/ 100;
-                //          var totalValue = numVal1- (numVal1 * numVal2)
-                // this.selectedIEMI.total  = totalValue.toFixed(2);
-                //           console.log(this.selectedIEMI.total)
-            },
 
-            async productTotal() {
-                if (event.target.id == 'p_d_percent') {
-                    this.selectedProduct.discount = ((parseFloat(this.selectedProduct.Product_SellingPrice) *
-                        parseFloat(this.p_discount_percent)) / 100).toFixed(2)
+
+                if (this.isSerial == 'true') {
+                    if (event.target.id == 'p_d_percent') {
+                        this.selectedIEMI.SaleDetails_Discount = (parseFloat(this.selectedIEMI.Product_SellingPrice) * (parseFloat(this.p_discount_percent) / 100)).toFixed(2);
+                    } else {
+                        this.p_discount_percent = ((parseFloat(this.selectedIEMI.SaleDetails_Discount) * 100) / parseFloat(this.selectedIEMI.Product_SellingPrice)).toFixed(2)
+                    }
+                    this.selectedIEMI.total = parseFloat(this.selectedIEMI.Product_SellingPrice) - parseFloat(this.selectedIEMI.SaleDetails_Discount)
                 } else {
-                    this.p_discount_percent = ((parseFloat(this.selectedProduct.discount) * 100) / parseFloat(
-                        this.selectedProduct.Product_SellingPrice)).toFixed(2)
+                    if (event.target.id == 'p_d_percent') {
+                        this.selectedProduct.discount = (parseFloat(this.selectedProduct.Product_SellingPrice) * parseFloat(this.selectedProduct.quantity) * (parseFloat(this.p_discount_percent) / 100)).toFixed(2);
+                    } else {
+                        this.p_discount_percent = ((parseFloat(this.selectedProduct.discount) * 100) / (parseFloat(this.selectedProduct.Product_SellingPrice) * parseFloat(this.selectedProduct.quantity))).toFixed(2)
+                    }
+                    this.selectedProduct.total = (parseFloat(this.selectedProduct.Product_SellingPrice) * parseFloat(this.selectedProduct.quantity)) - parseFloat(this.selectedProduct.discount)
                 }
 
-                this.selectedProduct.total = ((parseFloat(this.selectedProduct.Product_SellingPrice) -
-                    parseFloat(this.selectedProduct.discount)) * parseFloat(this.selectedProduct
-                    .quantity)).toFixed(2)
+
+                //this.selectedProduct.total = (parseFloat(this.selectedProduct.quantity) * parseFloat(this.selectedProduct.Product_SellingPrice)).toFixed(2);
+                // var numVal1 = this.selectedIEMI.Product_SellingPrice * 1;
+                // var numVal2 = this.selectedIEMI.SaleDetails_Discount / 100;
+                // var totalValue = numVal1 - (numVal1 * numVal2)
+                // this.selectedIEMI.total = totalValue.toFixed(2);
+
             },
             onSalesTypeChange() {
                 this.selectedCustomer = {
@@ -1041,8 +859,6 @@
 
                 }
                 this.$refs.quantity.focus();
-                this.p_discount_percent = 0;
-                this.imei_cart = [];
             },
             toggleProductPurchaseRate() {
                 //this.productPurchaseRate = this.productPurchaseRate == '' ? this.selectedProduct.Product_Purchase_Rate : '';
@@ -1050,58 +866,119 @@
                     'text';
             },
             addToCart() {
+                if (this.isSerial == 'true') {
+                    if (this.selectedIEMI.Product_SlNo == '') {
+                        alert('Select a product serial');
+                        return;
+                    }
 
-                if (this.selectedProduct.Product_SlNo == '') {
-                    alert('Select a product');
-                    return;
+                    if (this.selectedIEMI.Product_SellingPrice == '' || this.selectedIEMI.Product_SellingPrice == 0) {
+                        alert('Enter sales rate');
+                        return;
+                    }
+
+                    let product = {
+                        productId: this.selectedIEMI.Product_SlNo,
+                        productCode: this.selectedIEMI.Product_Code,
+                        UnitName: this.selectedIEMI.Unit_Name,
+                        name: this.selectedIEMI.Product_Name,
+                        salesRate: this.selectedIEMI.Product_SellingPrice,
+                        vat: this.selectedIEMI.vat,
+                        quantity: 1,
+                        total: this.selectedIEMI.total,
+                        purchaseRate: this.selectedIEMI.Product_Purchase_Rate,
+                        purchase_discount: this.selectedIEMI.purchase_discount,
+                        SaleDetails_Discount: this.selectedIEMI.SaleDetails_Discount,
+                        SerialStore: [{
+                            ps_imei_number: this.selectedIEMI.ps_imei_number
+                        }]
+                    }
+
+                    let checkCart = this.cart.filter((item, ind) => {
+                        return (item.productId == this.selectedIEMI.Product_SlNo) && (item.salesRate == this
+                            .selectedIEMI.Product_SellingPrice) && (item.SaleDetails_Discount == this
+                            .selectedIEMI.SaleDetails_Discount);
+                    });
+
+                    let getCurrentInd = this.cart.findIndex((item) => {
+                        return (item.productId == this.selectedIEMI.Product_SlNo) && (item.salesRate == this
+                            .selectedIEMI.Product_SellingPrice) && (item.SaleDetails_Discount == this
+                            .selectedIEMI.SaleDetails_Discount);
+                    });
+
+                    if (checkCart.length > 0) {
+                        checkCart.map((item) => {
+                            let storeObj = item.SerialStore;
+                            let checkSameI = item.SerialStore.findIndex((item) => {
+                                return product.SerialStore[0]['ps_imei_number'] == item.ps_imei_number;
+                            })
+                            if (checkSameI > -1) {
+                                alert("Already Added !!");
+                                return false;
+                            }
+                            storeObj.push(product.SerialStore[0]);
+                            this.cart[getCurrentInd].quantity = storeObj.length;
+                            this.cart[getCurrentInd].total = parseFloat(this.selectedIEMI.total) + parseFloat(
+                                this.cart[getCurrentInd].total);
+
+                        })
+
+                    } else {
+                        this.cart.push(product);
+                    }
+
+                    document.querySelector('#imei input[role="combobox"]').focus();
+                } else {
+
+                    if (this.selectedProduct.Product_SlNo == '') {
+                        alert('Select a product');
+                        return;
+                    }
+
+                    if (this.selectedProduct.Product_SellingPrice == '' || this.selectedProduct.Product_SellingPrice == 0) {
+                        alert('Enter sales rate');
+                        return;
+                    }
+
+                    if (this.selectedProduct.quantity == 0 || this.selectedProduct.quantity == '') {
+                        alert('Enter quantity');
+                        return;
+                    }
+
+                    if (parseFloat(this.selectedProduct.quantity) > parseFloat(this.productStock) && this.sales.isService == 'false') {
+                        alert('Stock unavailable');
+                        return;
+                    }
+
+                    let product = {
+                        productId: this.selectedProduct.Product_SlNo,
+                        productCode: this.selectedProduct.Product_Code,
+                        UnitName: this.selectedProduct.Unit_Name,
+                        name: this.selectedProduct.Product_Name,
+                        salesRate: this.selectedProduct.Product_SellingPrice,
+                        vat: this.selectedProduct.vat,
+                        quantity: this.selectedProduct.quantity,
+                        total: this.selectedProduct.total,
+                        purchaseRate: this.selectedProduct.Product_Purchase_Rate,
+                        SaleDetails_Discount: this.selectedProduct.discount,
+                        SerialStore: []
+                    }
+
+                    let getCurrentInd = this.cart.findIndex((item) => {
+                        return (item.productId == this.selectedProduct.Product_SlNo);
+                    });
+
+                    if (getCurrentInd > -1) {
+                        alert("The Product already added in the cart!");
+                        return;
+                    }
+
+                    this.cart.push(product);
+                    document.querySelector('#product input[role="combobox"]').focus();
                 }
-
-                if (this.selectedProduct.Product_SellingPrice == '' || this.selectedProduct.Product_SellingPrice ==
-                    0) {
-                    alert('Enter sales rate');
-                    return;
-                }
-
-                if (this.selectedProduct.quantity == 0 || this.selectedProduct.quantity == '') {
-                    alert('Enter quantity');
-                    return;
-                }
-
-                if (parseFloat(this.selectedProduct.quantity) > parseFloat(this.productStock) && this.sales
-                    .isService == 'false') {
-                    alert('Stock unavailable');
-                    return;
-                }
-
-                let product = {
-                    productId: this.selectedProduct.Product_SlNo,
-                    productCode: this.selectedProduct.Product_Code,
-                    UnitName: this.selectedProduct.Unit_Name,
-                    name: this.selectedProduct.Product_Name,
-                    salesRate: this.selectedProduct.Product_SellingPrice,
-                    vat: this.selectedProduct.vat,
-                    quantity: this.selectedProduct.quantity,
-                    total: this.selectedProduct.total,
-                    purchaseRate: this.selectedProduct.Product_Purchase_Rate,
-                    SaleDetails_Discount: this.selectedProduct.discount,
-                    SerialStore: this.selectedProduct.Is_Serial == 'true' ? this.imei_cart : [],
-                }
-
-                let getCurrentInd = this.cart.findIndex((item) => {
-                    return (item.productId == this.selectedProduct.Product_SlNo);
-                });
-
-                if (getCurrentInd > -1) {
-                    alert("The Product already added in the cart!");
-                    return;
-                }
-
-                this.cart.push(product);
-                // document.querySelector('#product input[role="combobox"]').focus();
 
                 this.clearProduct();
                 this.calculateTotal();
-                this.imei_cart = [];
             },
             removeFromCart(ind, imei) {
                 if (this.sales.salesId != 0) {
@@ -1118,6 +995,25 @@
                 }
             },
             clearProduct() {
+
+                this.selectedIEMI = {
+                    Product_SlNo: '',
+                    display_text: 'Select Product',
+                    Product_Name: '',
+                    Unit_Name: '',
+                    quantity: 1,
+                    Product_Purchase_Rate: '',
+                    Product_SellingPrice: 0.00,
+                    vat: 0.00,
+
+                    total: 0.00,
+                    ps_prod_id: '',
+                    ps_imei_number: '',
+                    SaleDetails_Discount: 0,
+                    ProductCategory_Name: '',
+                    ProductCategory_ID: ''
+                }
+
                 this.selectedProduct = {
                     Product_SlNo: '',
                     display_text: 'Select Product',
@@ -1148,48 +1044,35 @@
                 this.sales.total = ((parseFloat(this.sales.subTotal) + parseFloat(this.sales.vat) + parseFloat(this
                     .sales.transportCost)) - parseFloat(this.sales.discount)).toFixed(2);
                 if (this.selectedCustomer.Customer_Type == 'G') {
-                    this.sales.paid = (parseFloat(this.sales.cashPaid) + parseFloat(this.sales.bankPaid)).toFixed(2)
+                    this.sales.paid = this.sales.total;
                     this.sales.due = (parseFloat(this.sales.total) - parseFloat(this.sales.paid)).toFixed(2);
                 } else {
-                    this.sales.paid = (parseFloat(this.sales.cashPaid) + parseFloat(this.sales.bankPaid)).toFixed(2)
                     this.sales.due = (parseFloat(this.sales.total) - parseFloat(this.sales.paid)).toFixed(2);
                 }
             },
-            // onChangeIMEI() {
-            //     if (this.selectedIEMI.Product_SlNo == '') {
-            //         return;
-            //     }
+            onChangeIMEI() {
+                if (this.selectedIEMI.Product_SlNo == '') {
+                    return;
+                }
 
-            //     this.selectedProduct.quantity = 1;
-            //     this.selectedIEMI.SaleDetails_Discount = this.selectedIEMI.discount;
-            //     // this.selectedIEMI.total = (parseFloat(this.selectedIEMI.quantity.quantity) * parseFloat(this.selectedIEMI.Product_SellingPrice)).toFixed(2);
+                this.selectedProduct.quantity = 1;
+                this.selectedIEMI.SaleDetails_Discount = this.selectedIEMI.discount;
+                // this.selectedIEMI.total = (parseFloat(this.selectedIEMI.quantity.quantity) * parseFloat(this.selectedIEMI.Product_SellingPrice)).toFixed(2);
 
-            //     this.productTotal()
-            //     this.$refs.p_d_percent.focus();
-            //     //   this.selectedProduct.total = (parseFloat(this.selectedProduct.quantity) * parseFloat(this.selectedProduct.Product_SellingPrice)).toFixed(2);
+                this.productTotal()
+                this.$refs.p_d_percent.focus();
+                // 	this.selectedProduct.total = (parseFloat(this.selectedProduct.quantity) * parseFloat(this.selectedProduct.Product_SellingPrice)).toFixed(2);
+                // 	console.log(this.selectedProduct.total)
 
-            // },
+            },
             saveSales() {
 
                 if (this.selectedCustomer.Customer_SlNo == '') {
                     alert('Select Customer');
                     return;
                 }
-                if (this.selectedCustomer.Customer_Type == 'G' && parseFloat(this.sales.total) != parseFloat(this
-                        .sales.paid)) {
-                    alert('Paid Amount not equal');
-                    return;
-                }
-                if (parseFloat(this.sales.total) < parseFloat(this.sales.paid)) {
-                    alert('Paid Amount does not greater than Total amount');
-                    return;
-                }
                 if (this.cart.length == 0) {
                     alert('Cart is empty');
-                    return;
-                }
-                if (parseFloat(this.sales.bankPaid) > 0 && this.selectedAccount == null) {
-                    alert("Select Bank Account")
                     return;
                 }
 
@@ -1221,13 +1104,12 @@
                     cart: this.cart
                 }
 
-                if (parseFloat(this.sales.bankPaid) > 0) {
-                    this.sales.account_id = this.selectedAccount.account_id
-                }
-
                 if (this.selectedCustomer.Customer_Type == 'G') {
                     data.customer = this.selectedCustomer;
                 }
+
+                // console.log(data, this.selectedEmployee);
+                // return;
 
                 axios.post(url, data).then(async res => {
                     let r = res.data;
@@ -1248,8 +1130,8 @@
                     }
                 })
             },
-            async getSales() {
-                await axios.post('/get_sales', {
+            getSales() {
+                axios.post('/get_sales', {
                     salesId: this.sales.salesId
                 }).then(res => {
                     let r = res.data;
@@ -1266,20 +1148,15 @@
                     this.sales.transportCost = sales.SaleMaster_Freight;
                     this.sales.total = sales.SaleMaster_TotalSaleAmount;
                     this.sales.paid = sales.SaleMaster_PaidAmount;
-                    this.sales.cashPaid = sales.cashPaid;
-                    this.sales.bankPaid = sales.bankPaid;
                     this.sales.previousDue = sales.SaleMaster_Previous_Due;
                     this.sales.due = sales.SaleMaster_DueAmount;
-                    this.sales.payment_type = sales.payment_type;
-                    this.sales.account_id = sales.account_id;
                     this.sales.note = sales.SaleMaster_Description;
                     // this.sales.commission = sales.commission;
 
                     this.oldCustomerId = sales.SalseCustomer_IDNo;
                     this.oldPreviousDue = sales.SaleMaster_Previous_Due;
 
-                    this.vatPercent = parseFloat(this.sales.vat) * 100 / parseFloat(this.sales
-                        .subTotal);
+                    this.vatPercent = parseFloat(this.sales.vat) * 100 / parseFloat(this.sales.subTotal);
                     this.discountPercent = parseFloat(this.sales.discount) * 100 / parseFloat(this.sales
                         .subTotal);
 
@@ -1287,10 +1164,6 @@
                         Employee_SlNo: sales.employee_id,
                         Employee_Name: sales.Employee_Name,
                         // Commission: sales.Commission
-                    }
-                    this.selectedAccount = {
-                        account_id: sales.account_id,
-                        display_text: sales.display_text,
                     }
 
                     this.selectedCustomer = {
@@ -1304,11 +1177,6 @@
                     }
 
                     r.saleDetails.forEach(product => {
-
-                        product.imei.map(async p => {
-                            return p.imeiNumber = p.ps_imei_number;
-                        })
-
                         let cartProduct = {
                             productId: product.Product_IDNo,
                             productCode: product.Product_Code,

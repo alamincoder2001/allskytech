@@ -23,6 +23,7 @@ class Purchase extends CI_Controller
     }
 
     public function getPurchases(){
+
         $data = json_decode($this->input->raw_input_stream);
         $branchId = $this->session->userdata('BRANCHid');
 
@@ -386,6 +387,9 @@ class Purchase extends CI_Controller
         try{
             $data = json_decode($this->input->raw_input_stream);
 
+            echo json_encode($data);
+            exit();
+
             $invoice = $data->purchase->invoice;
             $invoiceCount = $this->db->query("select * from tbl_purchasemaster where PurchaseMaster_InvoiceNo = ?", $invoice)->num_rows();
             if($invoiceCount != 0){
@@ -417,7 +421,9 @@ class Purchase extends CI_Controller
                 'PurchaseMaster_Tax' => $data->purchase->vat,
                 'PurchaseMaster_Freight' => $data->purchase->freight,
                 'PurchaseMaster_SubTotalAmount' => $data->purchase->subTotal,
-                'PurchaseMaster_PaidAmount' => $data->purchase->paid,
+                'PurchaseMaster_cashPaid' => $data->purchase->cashPaid,
+                'PurchaseMaster_bankPaid' => $data->purchase->bankPaid, 
+                'account_id' => $data->purchase->account_id, 
                 'PurchaseMaster_DueAmount' => $data->purchase->due,
                 'previous_due' => $data->purchase->previousDue,
                 'PurchaseMaster_Description' => $data->purchase->note,
@@ -501,7 +507,9 @@ class Purchase extends CI_Controller
                 'PurchaseMaster_Tax' => $data->purchase->vat,
                 'PurchaseMaster_Freight' => $data->purchase->freight,
                 'PurchaseMaster_SubTotalAmount' => $data->purchase->subTotal,
-                'PurchaseMaster_PaidAmount' => $data->purchase->paid,
+                'cashPaid' => $data->purchase->cashPaid,
+                'bankPaid' => $data->purchase->bankPaid,
+                'PurchaseMaster_PaidAmount' => $data->purchase->cashPaid + $data->purchase->bankPaid,
                 'PurchaseMaster_DueAmount' => $data->purchase->due,
                 'previous_due' => $data->purchase->previousDue,
                 'PurchaseMaster_Description' => $data->purchase->note,

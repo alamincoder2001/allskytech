@@ -115,7 +115,7 @@
         </div>
         <div class="col-md-12">
             <div class="table-responsive" id="reportContent">
-                <table class="record-table">
+                <table class="table table-striped table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>Invoice No.</th>

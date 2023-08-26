@@ -146,7 +146,7 @@
 		</div> -->
         <div class="col-md-12" style="margin-top: 5px;">
             <div class="table-responsive" id="reportContent">
-                <table id="table" class="record-table" v-if="(searchType == '' || searchType == 'user') && recordType == 'with_details'" style="display:none" v-bind:style="{display: (searchType == '' || searchType == 'user') && recordType == 'with_details' ? '' : 'none'}">
+                <table id="table" class="table table-striped table-bordered table-hover" v-if="(searchType == '' || searchType == 'user') && recordType == 'with_details'" style="display:none" v-bind:style="{display: (searchType == '' || searchType == 'user') && recordType == 'with_details' ? '' : 'none'}">
                     <thead>
                         <tr>
                             <th>Invoice No.</th>
@@ -227,7 +227,7 @@
                     </tbody>
                 </table>
 
-                <table id="table" class="record-table" v-if="(searchType == '' || searchType == 'user' || searchType == 'supplier') && recordType == 'without_details'" style="display:none" v-bind:style="{display: (searchType == '' || searchType == 'user' || searchType == 'supplier') && recordType == 'without_details' ? '' : 'none'}">
+                <table id="table" class="table table-striped table-bordered table-hover" v-if="(searchType == '' || searchType == 'user' || searchType == 'supplier') && recordType == 'without_details'" style="display:none" v-bind:style="{display: (searchType == '' || searchType == 'user' || searchType == 'supplier') && recordType == 'without_details' ? '' : 'none'}">
                     <thead>
                         <tr>
                             <th>Invoice No.</th>
@@ -311,7 +311,7 @@
                     </tfoot>
                 </table>
 
-                <table id="table" class="record-table" v-if="searchType == 'category' || searchType == 'quantity'" style="display:none;" v-bind:style="{display: searchType == 'category' || searchType == 'quantity' ? '' : 'none'}">
+                <table id="table" class="table table-striped table-bordered table-hover" v-if="searchType == 'category' || searchType == 'quantity'" style="display:none;" v-bind:style="{display: searchType == 'category' || searchType == 'quantity' ? '' : 'none'}">
                     <thead>
                         <tr>
                             <th>Invoice No.</th>

@@ -14,6 +14,7 @@ class Products extends CI_Controller
         $this->load->model('Model_table', "mt", TRUE);
         $this->load->model('Billing_model');
     }
+
     public function index()
     {
         $access = $this->mt->userAccess();
@@ -25,11 +26,13 @@ class Products extends CI_Controller
         $data['content'] = $this->load->view('Administrator/products/add_product', $data, TRUE);
         $this->load->view('Administrator/index', $data);
     }
+
     public function checkImeiNumber()
     {
         $obj = json_decode($this->input->raw_input_stream);
-        $query = $this->db->query("SELECT * FROM tbl_product_serial_numbers WHERE ps_imei_number=?", $obj->get_imei_number);
-        echo json_encode($query->num_rows());
+        $query['row'] = $this->db->query("SELECT * FROM tbl_product_serial_numbers WHERE ps_imei_number=?", $obj->get_imei_number)->num_rows();
+        $query['data'] = $this->db->query("SELECT * FROM tbl_product_serial_numbers WHERE ps_imei_number=?", $obj->get_imei_number)->result();
+        echo json_encode($query);
     }
 
     public function productLedger()
@@ -787,7 +790,12 @@ class Products extends CI_Controller
                     FROM tbl_product_serial_numbers as sl
                     INNER JOIN tbl_product as prod
                     ON prod.Product_SlNo='$prod_id'
-                    WHERE ps_status = 'a' and damage_status = 'no' and ps_prod_id='$prod_id' AND ps_brunch_id=" . $BRANCHid . " AND ps_p_r_status<>'yes' AND (ps_s_status IS NULL OR ps_s_status<>'yes' OR ps_s_r_status='yes')")->result();
+                    WHERE ps_status = 'a'
+                    and damage_status = 'no'
+                    and ps_prod_id='$prod_id'
+                    AND ps_brunch_id=" . $BRANCHid . 
+                    " AND ps_p_r_status<>'yes' 
+                    AND (ps_s_status IS NULL OR ps_s_status<>'yes' OR ps_s_r_status='yes')")->result();
         echo json_encode($imeis);
     }
 
@@ -1096,10 +1104,33 @@ class Products extends CI_Controller
             WHERE sl.ps_brunch_id = ?
             AND sl.ps_status = 'a'
             AND sl.ps_p_r_status <> 'yes'
-            AND sl.damage_status <> 'yes'
+            AND sl.ps_dmg_status <> 'yes'
             AND (sl.ps_s_status IS NULL OR sl.ps_s_status = 'no' OR sl.ps_s_r_status ='yes')
             $clauses
             ", $this->session->userdata("BRANCHid"))->result();
         echo json_encode($serials);
+    }
+
+    public function updateImeiNumber()
+    {
+        $data = json_decode($this->input->raw_input_stream);
+        try {
+
+            $existCheck = $this->db->query("SELECT * FROM `tbl_product_serial_numbers` WHERE `ps_prod_id` = ? and `ps_imei_number` = ? and `ps_status` = 'a' and ps_id != ?", [$data->productId, $data->serial, $data->ps_id])->row();
+
+            if ($existCheck) {
+                $res = ['success' => false, 'message' => 'IMEI already exist. try another'];
+                echo json_encode($res);
+                exit;
+            }
+
+            $this->db->set(['ps_imei_number' => $data->serial])->where('ps_id', $data->ps_id)->update('tbl_product_serial_numbers');
+
+            $res = ['success' => true, 'message' => 'IMEI Update Successfully'];
+        } catch (Exception $ex) {
+            $res = ['success' => false, 'message' => $ex->getMessage()];
+        }
+
+        echo json_encode($res);
     }
 }

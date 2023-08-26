@@ -71,9 +71,11 @@ class Purchase extends CI_Controller
             s.Supplier_Email,
             s.Supplier_Code,
             s.Supplier_Address,
-            s.Supplier_Type
+            s.Supplier_Type,
+            b.account_name
             from tbl_purchasemaster pm
             join tbl_supplier s on s.Supplier_SlNo = pm.Supplier_SlNo
+            left join  tbl_bank_accounts b on b.account_id = pm.account_id
             where pm.PurchaseMaster_BranchID = '$branchId' 
             and pm.status = 'a'
             $purchaseIdClause $clauses
@@ -622,7 +624,10 @@ class Purchase extends CI_Controller
                 'PurchaseMaster_Tax'            => $data->purchase->vat,
                 'PurchaseMaster_Freight'        => $data->purchase->freight,
                 'PurchaseMaster_SubTotalAmount' => $data->purchase->subTotal,
-                'PurchaseMaster_PaidAmount'     => $data->purchase->paid,
+                'account_id'                    => $data->purchase->account_id,
+                'PurchaseMaster_cashPaid'       => $data->purchase->cashPaid,
+                'PurchaseMaster_bankPaid'      => $data->purchase->bankPaid,
+                'PurchaseMaster_PaidAmount'     => $data->purchase->cashPaid + $data->purchase->bankPaid,
                 'PurchaseMaster_DueAmount'      => $data->purchase->due,
                 'previous_due'                  => $data->purchase->previousDue,
                 'PurchaseMaster_Description'    => $data->purchase->note,
@@ -736,7 +741,10 @@ class Purchase extends CI_Controller
                 'PurchaseMaster_Tax'            => $data->purchase->vat,
                 'PurchaseMaster_Freight'        => $data->purchase->freight,
                 'PurchaseMaster_SubTotalAmount' => $data->purchase->subTotal,
-                'PurchaseMaster_PaidAmount'     => $data->purchase->paid,
+                'account_id'                    => $data->purchase->account_id,
+                'PurchaseMaster_cashPaid'       => $data->purchase->cashPaid,
+                'PurchaseMaster_bankPaid'      => $data->purchase->bankPaid,
+                'PurchaseMaster_PaidAmount'     => $data->purchase->cashPaid + $data->purchase->bankPaid,
                 'PurchaseMaster_DueAmount'      => $data->purchase->due,
                 'previous_due'                  => $data->purchase->previousDue,
                 'PurchaseMaster_Description'    => $data->purchase->note,

@@ -196,7 +196,7 @@
 			},
 			totalPurchase() {
 				return this.purchases.reduce((prev, curr) => {
-					return prev + parseFloat(curr.PurchaseMaster_PaidAmount)
+					return prev + parseFloat(curr.PurchaseMaster_cashPaid)
 				}, 0).toFixed(2);
 			},
 			totalReceivedFromCustomers() {
@@ -290,7 +290,7 @@
 			async getPurchases() {
 				await axios.post('/get_purchases', this.filter)
 					.then(res => {
-						this.purchases = res.data.purchases;
+						this.purchases = res.data.purchases.filter( purchase => purchase.PurchaseMaster_cashPaid);
 					})
 			},
 
@@ -393,7 +393,7 @@
 			async getEmployeePayments(){
 				await axios.post('/get_employee_payments', this.filter)
 				.then(res => { 
-					this.employeePayments = res.data;
+					this.employeePayments = res.data.filter((e) => { return e.payment_by != 'bank'});
 				})
 			},
 

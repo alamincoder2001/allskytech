@@ -985,7 +985,9 @@ class Account extends CI_Controller {
         echo json_encode($transactions);
     }
 
-    public function getAllBankTransactions(){
+    public function getAllBankTransactions()
+    {
+
         $data = json_decode($this->input->raw_input_stream);
 
         $clauses = "";
@@ -1030,6 +1032,29 @@ class Account extends CI_Controller {
                 where sm.Status = 'a'
                 and sm.bankPaid > 0
                 and sm.SaleMaster_branchid = " . $this->session->userdata('BRANCHid') . "
+
+                UNION
+                select 
+                'h' as sequence,
+                pm.PurchaseMaster_SlNo as id,
+                concat('Sales by Bank -', ac.bank_name, '(',ac.account_number,')') as description,
+                pm.account_id,
+                pm.PurchaseMaster_OrderDate as transaction_date,
+                'Deposit' as transaction_type,
+                0.00 as deposit,
+                pm.PurchaseMaster_bankPaid as withdraw,
+                pm.PurchaseMaster_Description as note,
+                ac.account_name,
+                ac.account_number,
+                ac.bank_name,
+                ac.branch_name,
+                0.00 as balance
+            from tbl_purchasemaster pm
+            join tbl_bank_accounts ac on ac.account_id = pm.account_id
+            where pm.Status = 'a'
+            and pm.PurchaseMaster_bankPaid > 0
+            and pm.PurchaseMaster_BranchID = " . $this->session->userdata('BRANCHid') . "
+
 
                 UNION
                 select 
@@ -1098,7 +1123,31 @@ class Account extends CI_Controller {
                 and cp.CPayment_status = 'a'
                 and cp.CPayment_TransactionType = 'CR'
                 and cp.CPayment_brunchid = " . $this->session->userdata('BRANCHid') . "
-                
+
+                UNION
+                select
+                    'i' as sequence,
+                    ep.employee_payment_id as id,
+                    concat('payment received - ', e.Employee_Name, ' (', e.Employee_ID, ')') as description, 
+                    ep.account_id,
+                    ep.payment_date as transaction_date,
+                    'withdraw' as transaction_type,
+                    0.00 as diposit,
+                    ep.payment_amount as withdraw,
+                    ep.description as note,
+                    ac.account_name,
+                    ac.account_number,
+                    ac.bank_name,
+                    ac.branch_name,
+                    0.00 as balance
+                from tbl_employee_payment ep
+                join tbl_bank_accounts ac on ac.account_id = ep.account_id
+                join tbl_employee e on e.Employee_SlNo = ep.Employee_SlNo
+                where ep.account_id is not null
+                and ep.status = 'a'
+                and ep.payment_by = 'bank'
+                and ep.paymentBranch_id = " . $this->session->userdata('BRANCHid') . "
+
                 UNION
                 select
                     'e' as sequence,
@@ -1541,10 +1590,11 @@ class Account extends CI_Controller {
                 pm.PurchaseMaster_OrderDate as date,
                 concat('Purchase - ', pm.PurchaseMaster_InvoiceNo, ' - ', s.Supplier_Name, ' (', s.Supplier_Code, ')', ' - Bill: ', pm.PurchaseMaster_TotalAmount) as description,
                 0.00 as in_amount,
-                pm.PurchaseMaster_PaidAmount as out_amount
+                pm.PurchaseMaster_cashPaid as out_amount
             from tbl_purchasemaster pm 
             join tbl_supplier s on s.Supplier_SlNo = pm.Supplier_SlNo
             where pm.status = 'a'
+            and pm.PurchaseMaster_cashPaid > 0
             and pm.PurchaseMaster_BranchID = '$this->brunch'
             and pm.PurchaseMaster_OrderDate between '$data->fromDate' and '$data->toDate'
             
@@ -1654,6 +1704,7 @@ class Account extends CI_Controller {
             join tbl_month m on m.month_id = ep.month_id
             where ep.paymentBranch_id = '$this->brunch'
             and ep.status = 'a'
+            and ep.payment_by != 'bank'
             and ep.payment_date between '$data->fromDate' and '$data->toDate'
             order by date, id
         ")->result();

@@ -1,46 +1,56 @@
 <style>
-	.v-select{
+	.v-select {
 		margin-bottom: 5px;
-        float: right;
-        min-width: 200px;
-        margin-left: 5px;
+		float: right;
+		min-width: 160px;
+		margin-left: 5px;
 	}
-	.v-select .dropdown-toggle{
+
+	.v-select .dropdown-toggle {
 		padding: 0px;
-        height: 25px;
+		height: 25px;
 	}
-	.v-select input[type=search], .v-select input[type=search]:focus{
+
+	.v-select input[type=search],
+	.v-select input[type=search]:focus {
 		margin: 0px;
 	}
-	.v-select .vs__selected-options{
+
+	.v-select .vs__selected-options {
 		overflow: hidden;
-		flex-wrap:nowrap;
+		flex-wrap: nowrap;
 	}
-	.v-select .selected-tag{
+
+	.v-select .selected-tag {
 		margin: 2px 0px;
 		white-space: nowrap;
-		position:absolute;
+		position: absolute;
 		left: 0px;
 	}
-	.v-select .vs__actions{
-		margin-top:-5px;
+
+	.v-select .vs__actions {
+		margin-top: -5px;
 	}
-	.v-select .dropdown-menu{
+
+	.v-select .dropdown-menu {
 		width: auto;
-		overflow-y:auto;
+		overflow-y: auto;
 	}
-    #salaryReport label{
-        font-size: 13px;
-		margin-top: 3px;
-    }
-    #salaryReport select{
-        border-radius: 3px;
-        padding: 0px;
+
+	#salaryReport label {
 		font-size: 13px;
-    }
-    #salaryReport .form-group{
-        margin-right: 10px;
-    }
+		margin-top: 3px;
+	}
+
+	#salaryReport select {
+		border-radius: 3px;
+		padding: 0px;
+		font-size: 13px;
+	}
+
+	#salaryReport .form-group {
+		margin-right: 10px;
+	}
 </style>
 
 <div id="salaryReport">
@@ -56,20 +66,16 @@
 				</div>
 				<div class="form-group" v-if="reportType == 'records'">
 					<label>Employee</label>
-					<select class="form-control" style="min-width:200px;" v-bind:style="{display: comEmployees.length > 0 ? 'none' : ''}"></select>
-					<v-select v-bind:options="comEmployees" v-model="selectedEmployee" label="display_text" 
-							style="display:none"
-							v-bind:style="{display: comEmployees.length > 0 ? '' : 'none'}"
-					></v-select>
+					<v-select v-bind:options="comEmployees" v-model="selectedEmployee" label="display_text"></v-select>
 				</div>
 
 				<div class="form-group">
-					<label>Month</label>
-					<select class="form-control" style="min-width:150px;" v-bind:style="{display: months.length > 0 ? 'none' : ''}"></select>
-					<v-select v-bind:options="months" v-model="selectedMonth" label="month_name"
-							style="display:none"
-							v-bind:style="{display: months.length > 0 ? '' : 'none'}"
-					></v-select>
+					<label>From Month</label>
+					<v-select v-bind:options="months" v-model="selectedMonth" label="month_name"></v-select>
+				</div>
+				<div class="form-group">
+					<label>To</label>
+					<v-select v-bind:options="monthsTo" v-model="selectedMonthTo" label="month_name"></v-select>
 				</div>
 
 				<div class="form-group" style="margin-top: -5px;">
@@ -126,7 +132,7 @@
 
 				<div style="display:none;" v-bind:style="{display: paymentSummary.length > 0 && reportType == 'summary' ? '' : 'none'}">
 					<h3 style="text-align:center;">Salary Summary</h3>
-					<h6 style="text-align:center;" v-if="selectedMonth != null">{{ selectedMonth.month_name }}</h6 style="text-align:center;">
+					<h6 style="text-align:center;" v-if="selectedMonth.month_id != ''">{{ selectedMonth.month_name }}</h6 style="text-align:center;">
 					<table class="table table-bordered table-condensed">
 						<thead>
 							<tr>
@@ -170,40 +176,51 @@
 	</div>
 </div>
 
-<script src="<?php echo base_url();?>assets/js/vue/vue.min.js"></script>
-<script src="<?php echo base_url();?>assets/js/vue/axios.min.js"></script>
-<script src="<?php echo base_url();?>assets/js/vue/vue-select.min.js"></script>
-<script src="<?php echo base_url();?>assets/js/moment.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/vue.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/axios.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/vue-select.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/moment.min.js"></script>
 
 <script>
 	Vue.component('v-select', VueSelect.VueSelect);
 	new Vue({
 		el: '#salaryReport',
-		data(){
+		data() {
 			return {
 				employees: [],
-				selectedEmployee: null,
+				selectedEmployee: {
+					Employee_SlNo: '',
+					display_text: 'All'
+				},
 				months: [],
-				selectedMonth: null,
+				selectedMonth: {
+					month_id: '',
+					month_name: 'Select Month'
+				},
+				monthsTo: [],
+				selectedMonthTo: {
+					month_id: '',
+					month_name: 'Select Month'
+				},
 				payments: [],
 				paymentSummary: [],
 				reportType: 'records'
 			}
 		},
-		computed:{
-			comEmployees(){
+		computed: {
+			comEmployees() {
 				return this.employees.map(employee => {
 					employee.display_text = employee.Employee_SlNo == '' ? employee.Employee_Name : `${employee.Employee_Name} - ${employee.Employee_ID}`;
 					return employee;
 				})
 			}
 		},
-		created(){
+		created() {
 			this.getEmployees();
 			this.getMonths();
 		},
 		methods: {
-			getEmployees(){
+			getEmployees() {
 				axios.get('/get_employees').then(res => {
 					this.employees = res.data;
 					this.employees.unshift({
@@ -212,72 +229,80 @@
 					})
 				})
 			},
-			getMonths(){
+			getMonths() {
 				axios.get('/get_months').then(res => {
 					this.months = res.data;
-					this.months.unshift({
-						month_id: '',
-						month_name: 'All'
-					})
+					this.monthsTo = res.data;
+					// this.months.unshift({
+					// 	month_id: '',
+					// 	month_name: 'All'
+					// })
 				})
 			},
-			onChangeReportType(){
-				if(this.reportType == 'summary'){
+			onChangeReportType() {
+				if (this.reportType == 'summary') {
 					this.months = this.months.filter(month => month.month_id != '');
 					this.paymentSummary = [];
 				} else {
-					this.months.unshift({
-						month_id: '',
-						month_name: 'All'
-					})
+					// this.months.unshift({
+					// 	month_id: '',
+					// 	month_name: 'All'
+					// })
 					this.payments = [];
 				}
 			},
-			showReport(){
-				if(this.reportType == 'records'){
+			showReport() {
+				if (this.reportType == 'records') {
 					this.getEmployeePayments();
 				} else {
 					this.getSalarySummary();
 				}
 			},
-			getEmployeePayments(){
+			getEmployeePayments() {
 				let data = {}
-				if(this.selectedEmployee == null){
+				if (this.selectedEmployee.Employee_SlNo == '') {
 					data.employeeId = '';
 				} else {
 					data.employeeId = this.selectedEmployee.Employee_SlNo;
 				}
 
-				if(this.selectedMonth == null){
-					data.month = '';
+				if (this.selectedMonth.month_id == '') {
+					data.monthFrom = '';
 				} else {
-					data.month = this.selectedMonth.month_id;
+					data.monthFrom = this.selectedMonth.month_id;
+				}
+				if (this.selectedMonthTo.month_id == '') {
+					data.monthTo = '';
+				} else {
+					data.monthTo = this.selectedMonthTo.month_id;
 				}
 				axios.post('/get_employee_payments', data)
-				.then(res => {
-					this.payments = res.data;
-				})
+					.then(res => {
+						this.payments = res.data;
+					})
 			},
-			getSalarySummary(){
-				if(this.selectedMonth == null || this.selectedMonth.month_id == ''){
+			getSalarySummary() {
+				if (this.selectedMonth.month_id == '' || this.selectedMonthTo.month_id == '') {
 					alert('Select month');
 					return;
 				}
+
 				let data = {
-					monthId: this.selectedMonth.month_id,
-					monthName: this.selectedMonth.month_name	
+					monthFrom: this.selectedMonth.month_id,
+					monthTo: this.selectedMonthTo.month_id,
+					monthName: this.selectedMonth.month_name
 				}
 				axios.post('/get_salary_summary', data)
-				.then(res => {
-					this.paymentSummary = res.data;
-				})
-				.catch(error => {
-					if(error.response){
-						alert(`${error.response.status}, ${error.response.statusText}`);
-					}
-				})
+					.then(res => {
+						this.paymentSummary = res.data;
+					})
+					.catch(error => {
+						if (error.response) {
+							alert(`${error.response.status}, ${error.response.statusText}`);
+						}
+					})
 			},
-			async print(){
+			async print() {
 				let reportContent = `
 					<div class="container">
 						<div class="row">
@@ -290,7 +315,7 @@
 
 				var reportWindow = window.open('', 'PRINT', `height=${screen.height}, width=${screen.width}, left=0, top=0`);
 				reportWindow.document.write(`
-					<?php $this->load->view('Administrator/reports/reportHeader.php');?>
+					<?php $this->load->view('Administrator/reports/reportHeader.php'); ?>
 				`);
 
 				reportWindow.document.body.innerHTML += reportContent;

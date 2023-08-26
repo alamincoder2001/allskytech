@@ -237,6 +237,7 @@
 				axios.get('/get_accounts').then(res => {
 					this.accounts = res.data;
 				})
+
 			},
 			onChangeTransactionType(){
 				this.transaction.In_Amount = '';
@@ -244,8 +245,10 @@
 
 			},
 			getTransactions(){
+				const dateFrom = new Date();
+				dateFrom.setDate(dateFrom.getDate() - 30);
 				let data = {
-					dateFrom: this.transaction.Tr_date,
+					dateFrom: dateFrom,
 					dateTo: this.transaction.Tr_date
 				}
 

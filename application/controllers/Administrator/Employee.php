@@ -98,8 +98,8 @@ class Employee extends CI_Controller
             $clauses .= " and e.Employee_SlNo = '$data->employeeId'";
         }
 
-        if (isset($data->month) && $data->month != '') {
-            $clauses .= " and ep.month_id = '$data->month'";
+        if ((isset($data->monthFrom) && $data->monthFrom != '') && (isset($data->monthTo) && $data->monthTo != '')) {
+            $clauses .= " and ep.month_id between '$data->monthFrom' and '$data->monthTo'";
         }
 
         if (isset($data->dateFrom) && $data->dateFrom != '' && isset($data->dateTo) && $data->dateTo != '') {
@@ -115,9 +115,11 @@ class Employee extends CI_Controller
                 dp.Department_Name,
                 ds.Designation_Name,
                 u.User_Name,
-                m.month_name
+                m.month_name,
+                (select concat(ba.account_name, ' ' ,ba.bank_name)) as display_text
             from tbl_employee_payment ep
             join tbl_employee e on e.Employee_SlNo = ep.Employee_SlNo
+            left join tbl_bank_accounts ba on ba.account_id = ep.account_id
             join tbl_department dp on dp.Department_SlNo = e.Department_ID
             join tbl_designation ds on ds.Designation_SlNo = e.Designation_ID
             join tbl_month m on m.month_id = ep.month_id
@@ -149,7 +151,7 @@ class Employee extends CI_Controller
                     select ifnull(sum(ep.payment_amount), 0) from tbl_employee_payment ep
                     where ep.Employee_SlNo = e.Employee_SlNo
                     and ep.status = 'a'
-                    and ep.month_id = " . $data->monthId . "
+                    and ep.month_id between '$data->monthFrom' and '$data->monthTo'
                     and ep.paymentBranch_id = " . $this->session->userdata('BRANCHid') . "
                 ) as paid_amount,
                 
@@ -157,7 +159,7 @@ class Employee extends CI_Controller
                     select ifnull(sum(ep.deduction_amount), 0) from tbl_employee_payment ep
                     where ep.Employee_SlNo = e.Employee_SlNo
                     and ep.status = 'a'
-                    and ep.month_id = " . $data->monthId . "
+                    and ep.month_id between '$data->monthFrom' and '$data->monthTo'
                     and ep.paymentBranch_id = " . $this->session->userdata('BRANCHid') . "
                 ) as deducted_amount,
                 
@@ -1230,5 +1232,35 @@ class Employee extends CI_Controller
         }
 
         echo json_encode($record);
+    }
+
+    public function salaryPaymentPrint($paymentId)
+    {
+        $access = $this->mt->userAccess();
+        if (!$access) {
+            redirect(base_url());
+        }
+        $data['title'] = "Employee Payment Invoice";
+
+        $data['payment'] = $this->db->query("SELECT
+            ep.*,
+            m.month_name,
+            e.Designation_ID,
+            e.Department_ID,
+            e.Employee_Name,
+            e.Employee_ContactNo,
+            e.Employee_Email,
+            d.Designation_Name,
+            ed.Department_Name
+            FROM tbl_employee_payment ep
+            LEFT JOIN tbl_employee e on e.Employee_SlNo = ep.Employee_SlNo
+            left join tbl_designation d on d.Designation_SlNo = e.Designation_ID
+            left join tbl_department ed on ed.Department_SlNo  = e.Department_ID
+            LEFT JOIN tbl_month m on m.month_id = ep.month_id
+            WHERE ep.employee_payment_id = ?
+        ", $paymentId)->row();
+
+        $data['content'] = $this->load->view('Administrator/employee/employee_payment_invoice', $data, TRUE);
+        $this->load->view('Administrator/index', $data);
     }
 }

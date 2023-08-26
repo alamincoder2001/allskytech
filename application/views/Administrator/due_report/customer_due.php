@@ -78,7 +78,7 @@
 			<i class="fa fa-print"></i> Print
 		</a>
 		<div class="table-responsive" id="reportTable">
-			<table class="table table-bordered">
+			<table class="table table-striped table-bordered table-hover">
 				<thead>
 					<tr>
 						<th>Customer Id</th>

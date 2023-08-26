@@ -98,113 +98,6 @@ $companyInfo = $this->db->query("select * from tbl_company c order by c.Company_
 </head>
 
 <body class="skin-2">
-    <div id="navbar" class="navbar navbar-default ace-save-state navbar-fixed-top"
-        style="background:#438EB9 !important;">
-        <div class="navbar-container ace-save-state" id="navbar-container">
-            <button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler" data-target="#sidebar">
-                <span class="sr-only">Toggle sidebar</span>
-
-                <span class="icon-bar"></span>
-
-                <span class="icon-bar"></span>
-
-                <span class="icon-bar"></span>
-            </button>
-
-            <div class="navbar-header pull-left">
-                <a href="<?php echo base_url(); ?>" class="navbar-brand">
-                    <small>
-                        <i class="fa fa-leaf"></i>
-                        <!--Enterprise Resource Planning-->
-                        <?php echo $companyInfo->Company_Name; ?>
-                        <!-- <span style="color:#000;font-weight:700;letter-spacing:1px;font-size:16px;">
-							<?php echo $this->session->userdata('Brunch_name');
-							?>
-						</span> -->
-                    </small>
-                </a>
-            </div>
-
-            <div class="navbar-buttons navbar-header pull-right" role="navigation">
-                <ul class="nav ace-nav" style="position: relative;">
-                    <?php
-					$userID =  $this->session->userdata('userId');
-					$CheckSuperAdmin = $this->db->where('UserType', 'm')->where('User_SlNo', $userID)->get('tbl_user')->row();
-					if (isset($CheckSuperAdmin)) :
-					?>
-                    <li class="light-blue dropdown-modal forMobileBranch">
-                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-                            <big>Branch Acess</big>
-                            <i class="ace-icon fa fa-caret-down"></i>
-                        </a>
-
-                        <ul
-                            class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
-
-                            <?php
-								$sql = $this->db->query("SELECT * FROM tbl_brunch where status = 'a' order by Brunch_name asc ");
-								$row = $sql->result();
-								foreach ($row as $row) { ?>
-                            <li>
-                                <a class="btn-add fancybox fancybox.ajax"
-                                    href="<?php echo base_url(); ?>brachAccess/<?php echo $row->brunch_id; ?>">
-                                    <i class="ace-icon fa fa-bank"></i>
-                                    <?php echo $row->Brunch_name; ?>
-                                </a>
-                            </li>
-                            <?php } ?>
-                        </ul>
-                    </li>
-                    <?php endif; ?>
-
-                    <li class="forMobileClock">
-                        <a class="clock" style="background:#438EB9 !important;">
-                            <span style="font-size:20px;"><i class="ace-icon fa fa-clock-o"></i></span> <span
-                                style="font-size:15px;">
-                                <?php date_default_timezone_set('Asia/Dhaka');
-								echo date("l, d F Y"); ?>,&nbsp;<span id="timer" style="font-size:15px;"></span></span>
-                        </a>
-                    </li>
-
-
-
-                    <li class="light-blue dropdown-modal forMobileUser">
-                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-                            <img class="nav-user-photo"
-                                src="<?php echo base_url(); ?>uploads/users/<?php echo $this->session->userdata('user_image'); ?>"
-                                alt="<?php echo $this->session->userdata('FullName'); ?>" />
-                            <span class="user-info">
-                                <small>Welcome,</small>
-                                <?php echo $this->session->userdata('FullName'); ?>
-                            </span>
-
-                            <i class="ace-icon fa fa-caret-down"></i>
-                        </a>
-
-                        <ul
-                            class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
-                            <li>
-                                <a href="<?php echo base_url(); ?>profile">
-                                    <i class="ace-icon fa fa-user"></i>
-                                    Profile
-                                </a>
-                            </li>
-
-                            <li class="divider"></li>
-
-                            <li>
-                                <a href="<?php echo base_url(); ?>Login/logout">
-                                    <i class="ace-icon fa fa-power-off"></i>
-                                    Logout
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                </ul>
-            </div>
-        </div><!-- /.navbar-container -->
-    </div>
 
     <div class="main-container ace-save-state" id="main-container">
         <script type="text/javascript">
@@ -220,91 +113,10 @@ $companyInfo = $this->db->query("select * from tbl_company c order by c.Company_
             } catch (e) {}
             </script>
 
-            <div class="sidebar-shortcuts" id="sidebar-shortcuts">
-                <div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
-                    <a href="/graph" class="btn btn-success">
-                        <i class="ace-icon fa fa-signal"></i>
-                    </a>
-
-                    <a href="/module/AccountsModule" class="btn btn-info">
-                        <i class="ace-icon fa fa-pencil"></i>
-                    </a>
-
-                    <a href="/module/HRPayroll" class="btn btn-warning">
-                        <i class="ace-icon fa fa-users"></i>
-                    </a>
-
-                    <a href="/module/Administration" class="btn btn-danger">
-                        <i class="ace-icon fa fa-cogs"></i>
-                    </a>
-                </div>
-
-                <div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
-                    <span class="btn btn-success"></span>
-
-                    <span class="btn btn-info"></span>
-
-                    <span class="btn btn-warning"></span>
-
-                    <span class="btn btn-danger"></span>
-                </div>
-            </div><!-- /.sidebar-shortcuts -->
-
-            <?php include('menu.php'); ?>
-
-            <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
-                <i id="sidebar-toggle-icon" class="ace-icon fa fa-angle-double-left ace-save-state"
-                    data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
-            </div>
         </div>
 
         <div class="main-content">
             <div class="main-content-inner">
-                <div class="breadcrumbs ace-save-state" id="breadcrumbs">
-                    <ul class="breadcrumb">
-                        <li>
-                            <i class="ace-icon fa fa-home home-icon"></i>
-                            <a href="#">Home</a>
-                        </li>
-
-                        <li>
-                            <a href="#"><?php echo $title; ?></a>
-                        </li>
-
-                        <li>
-                            <!--<div class="">
-								<?php
-								/* $success_alert = $this->session->userdata('success_alert');
-									$failure_alert = $this->session->userdata('failure_alert');
-									if(isset($success_alert)){ */
-								?>
-										<div class="alert alert-success alert-dismissible">
-										  <strong>Success!</strong> <?php //echo $success_alert; $this->session->unset_userdata('success_alert'); 
-																	?> .
-										</div>
-										<?php
-										/* }
-									
-									if(isset($failure_alert)){ */
-										?>
-										<div class="alert alert-danger">
-										  <strong>Unsuccess!</strong> <?php //echo $failure_alert;  $this->session->unset_userdata('failure_alert'); 
-																		?> .
-										</div>
-										<?php
-										//}
-										?>
-								</div>-->
-                        </li>
-
-                    </ul><!-- /.breadcrumb -->
-
-                    <div class="nav-search" id="nav-search">
-                        <span style="font-weight: bold; color: #972366; font-size: 16px;">
-                            <?php echo $this->session->userdata('Brunch_name');  ?>
-                        </span>
-                    </div><!-- /.nav-search -->
-                </div>
 
                 <div class="page-content">
                     <div id="loader" hidden
@@ -316,37 +128,11 @@ $companyInfo = $this->db->query("select * from tbl_company c order by c.Company_
 
 
                 </div><!-- /.page-content -->
-                <div class="row" style="display:none;">
-                    <table id="dynamic-table" class="table table-striped table-bordered table-hover">
-                    </table>
-                </div>
+
             </div>
         </div><!-- /.main-content -->
 
-        <div class="footer">
-            <div class="footer-inner">
-                <div class="footer-content">
-                    <span class="bigger-120">
-                        &copy;
-                        <span class="blue bolder">
-                            2023 AALL Sky Tech Ltd
-                            <!-- <a href="http://linktechbd.com/" target="_blank">Link Up Technology</a> -->
-                        </span>
-                    </span>
 
-                    &nbsp; &nbsp;
-                    <!-- <span class="action-buttons">
-						<a href="https://www.facebook.com/linktechbd" target="_blank">
-							<i class="ace-icon fa fa-facebook-square text-primary bigger-150"></i>
-						</a>
-					</span> -->
-                </div>
-            </div>
-        </div>
-
-        <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
-            <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
-        </a>
     </div><!-- /.main-container -->
 
     <!-- basic scripts -->
@@ -419,33 +205,7 @@ $companyInfo = $this->db->query("select * from tbl_company c order by c.Company_
 
     <!-- inline scripts related to this page -->
 
-    <script type="text/javascript">
-    setInterval(function() {
 
-        var currentTime = new Date();
-
-        var currentHours = currentTime.getHours();
-
-        var currentMinutes = currentTime.getMinutes();
-
-        var currentSeconds = currentTime.getSeconds();
-
-        currentMinutes = (currentMinutes < 10 ? "0" : "") + currentMinutes;
-
-        currentSeconds = (currentSeconds < 10 ? "0" : "") + currentSeconds;
-
-        var timeOfDay = (currentHours < 12) ? "AM" : "PM";
-
-        currentHours = (currentHours > 12) ? currentHours - 12 : currentHours;
-
-        currentHours = (currentHours == 0) ? 12 : currentHours;
-
-        var currentTimeString = currentHours + ":" + currentMinutes + ":" + currentSeconds + " " + timeOfDay;
-
-        document.getElementById("timer").innerHTML = currentTimeString;
-
-    }, 1000);
-    </script>
 
 
     <script type="text/javascript">

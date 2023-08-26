@@ -1,29 +1,36 @@
 <style>
-	.v-select{
+	.v-select {
 		margin-bottom: 5px;
 	}
-	.v-select .dropdown-toggle{
+
+	.v-select .dropdown-toggle {
 		padding: 0px;
 	}
-	.v-select input[type=search], .v-select input[type=search]:focus{
+
+	.v-select input[type=search],
+	.v-select input[type=search]:focus {
 		margin: 0px;
 	}
-	.v-select .vs__selected-options{
+
+	.v-select .vs__selected-options {
 		overflow: hidden;
-		flex-wrap:nowrap;
+		flex-wrap: nowrap;
 	}
-	.v-select .selected-tag{
+
+	.v-select .selected-tag {
 		margin: 2px 0px;
 		white-space: nowrap;
-		position:absolute;
+		position: absolute;
 		left: 0px;
 	}
-	.v-select .vs__actions{
-		margin-top:-5px;
+
+	.v-select .vs__actions {
+		margin-top: -5px;
 	}
-	.v-select .dropdown-menu{
+
+	.v-select .dropdown-menu {
 		width: auto;
-		overflow-y:auto;
+		overflow-y: auto;
 	}
 </style>
 
@@ -60,7 +67,7 @@
 				<i class="fa fa-print"></i> Print
 			</a>
 			<div class="table-responsive" id="reportTable">
-				<table class="table table-bordered">
+				<table class="table table-striped table-bordered table-hover">
 					<thead>
 						<tr>
 							<th>Supplier Code</th>
@@ -135,15 +142,17 @@
 				axios.post('/get_supplier_due', {
 					supplierId: this.selectedSupplier.Supplier_SlNo
 				}).then(res => {
-					if(this.searchType == 'supplier'){
+					if (this.searchType == 'supplier') {
 						this.dueList = res.data;
 					} else {
 						this.dueList = res.data.filter(d => parseFloat(d.due) != 0);
 					}
-					this.total = this.dueList.reduce((prev, curr) => {return prev + parseFloat(curr.due)}, 0);
+					this.total = this.dueList.reduce((prev, curr) => {
+						return prev + parseFloat(curr.due)
+					}, 0);
 				})
 			},
-			async print(){
+			async print() {
 				let reportContent = `
 					<div class="container">
 						<h4 style="text-align:center">Supplier due report</h4 style="text-align:center">
@@ -157,7 +166,7 @@
 
 				var mywindow = window.open('', 'PRINT', `width=${screen.width}, height=${screen.height}`);
 				mywindow.document.write(`
-					<?php $this->load->view('Administrator/reports/reportHeader.php');?>
+					<?php $this->load->view('Administrator/reports/reportHeader.php'); ?>
 				`);
 
 				mywindow.document.body.innerHTML += reportContent;

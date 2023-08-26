@@ -44,21 +44,22 @@ class Quotation extends CI_Controller
             }
 
             $quotation = array(
-                'SaleMaster_InvoiceNo' => $invoice,
-                'SaleMaster_SaleDate' => $data->quotation->quotationDate,
-                'SaleMaster_customer_name' => $data->quotation->customerName,
-                'SaleMaster_customer_id' => $data->quotation->customer_id,
-                'SaleMaster_customer_mobile' => $data->quotation->customerMobile,
-                'SaleMaster_customer_address' => $data->quotation->customerAddress,
-                'SaleMaster_TotalSaleAmount' => $data->quotation->total,
+                'SaleMaster_InvoiceNo'           => $invoice,
+                'SaleMaster_SaleDate'            => $data->quotation->quotationDate,
+                'SaleMaster_customer_name'       => $data->quotation->customerName,
+                'SaleMaster_customer_id'         => $data->quotation->customer_id,
+                'SaleMaster_customer_mobile'     => $data->quotation->customerMobile,
+                'SaleMaster_customer_address'    => $data->quotation->customerAddress,
+                'SaleMaster_TotalSaleAmount'     => $data->quotation->total,
                 'SaleMaster_TotalDiscountAmount' => $data->quotation->discount,
-                'SaleMaster_TaxAmount' => $data->quotation->vat,
-                'SaleMaster_SubTotalAmount' => $data->quotation->subTotal,
-                'Status' => 'a',
-                "AddBy" => $this->session->userdata("FullName"),
-                'AddTime' => date("Y-m-d H:i:s"),
-                'SaleMaster_branchid' => $this->session->userdata("BRANCHid"),
-                'note' => $data->quotation->note
+                'SaleMaster_TaxAmount'           => $data->quotation->vat,
+                'SaleMaster_SubTotalAmount'      => $data->quotation->subTotal,
+                'payment_term'                   => $data->quotation->payment_term,
+                'Status'                         => 'a',
+                "AddBy"                          => $this->session->userdata("FullName"),
+                'AddTime'                        => date("Y-m-d H:i:s"),
+                'SaleMaster_branchid'            => $this->session->userdata("BRANCHid"),
+                'note'                           => $data->quotation->note
             );
 
             $this->db->insert('tbl_quotation_master', $quotation);
@@ -67,16 +68,16 @@ class Quotation extends CI_Controller
 
             foreach ($data->cart as $cartProduct) {
                 $quotationDetails = array(
-                    'SaleMaster_IDNo' => $quotationId,
-                    'Product_IDNo' => $cartProduct->productId,
+                    'SaleMaster_IDNo'           => $quotationId,
+                    'Product_IDNo'              => $cartProduct->productId,
                     'SaleDetails_TotalQuantity' => $cartProduct->quantity,
-                    'SaleDetails_Rate' => $cartProduct->salesRate,
-                    'SaleDetails_TotalAmount' => $cartProduct->total,
-                    'Status' => 'a',
-                    'AddBy' => $this->session->userdata("FullName"),
-                    'AddTime' => date('Y-m-d H:i:s'),
-                    'SaleDetails_BranchId' => $this->session->userdata('BRANCHid'),
-                    'SaleDetails_Discount' => $cartProduct->discount
+                    'SaleDetails_Rate'          => $cartProduct->salesRate,
+                    'SaleDetails_TotalAmount'   => $cartProduct->total,
+                    'Status'                    => 'a',
+                    'AddBy'                     => $this->session->userdata("FullName"),
+                    'AddTime'                   => date('Y-m-d H:i:s'),
+                    'SaleDetails_BranchId'      => $this->session->userdata('BRANCHid'),
+                    'SaleDetails_Discount'      => $cartProduct->discountAmount
                 );
                 $this->db->insert('tbl_quotation_details', $quotationDetails);
             }
@@ -98,21 +99,22 @@ class Quotation extends CI_Controller
             $quotationId = $data->quotation->quotationId;
 
             $quotation = array(
-                'SaleMaster_InvoiceNo' => $data->quotation->invoiceNo,
-                'SaleMaster_SaleDate' => $data->quotation->quotationDate,
-                'SaleMaster_customer_name' => $data->quotation->customerName,
-                'SaleMaster_customer_id' => $data->quotation->customer_id,
-                'SaleMaster_customer_mobile' => $data->quotation->customerMobile,
-                'SaleMaster_customer_address' => $data->quotation->customerAddress,
-                'SaleMaster_TotalSaleAmount' => $data->quotation->total,
+                'SaleMaster_InvoiceNo'           => $data->quotation->invoiceNo,
+                'SaleMaster_SaleDate'            => $data->quotation->quotationDate,
+                'SaleMaster_customer_name'       => $data->quotation->customerName,
+                'SaleMaster_customer_id'         => $data->quotation->customer_id,
+                'SaleMaster_customer_mobile'     => $data->quotation->customerMobile,
+                'SaleMaster_customer_address'    => $data->quotation->customerAddress,
+                'SaleMaster_TotalSaleAmount'     => $data->quotation->total,
                 'SaleMaster_TotalDiscountAmount' => $data->quotation->discount,
-                'SaleMaster_TaxAmount' => $data->quotation->vat,
-                'SaleMaster_SubTotalAmount' => $data->quotation->subTotal,
-                'Status' => 'a',
-                "AddBy" => $this->session->userdata("FullName"),
-                'AddTime' => date("Y-m-d H:i:s"),
-                'SaleMaster_branchid' => $this->session->userdata("BRANCHid"),
-                'note' => $data->quotation->note
+                'SaleMaster_TaxAmount'           => $data->quotation->vat,
+                'SaleMaster_SubTotalAmount'      => $data->quotation->subTotal,
+                'payment_term'                   => $data->quotation->payment_term,
+                'Status'                         => 'a',
+                "AddBy"                          => $this->session->userdata("FullName"),
+                'AddTime'                        => date("Y-m-d H:i:s"),
+                'SaleMaster_branchid'            => $this->session->userdata("BRANCHid"),
+                'note'                           => $data->quotation->note
             );
 
             $this->db->where('SaleMaster_SlNo', $quotationId)->update('tbl_quotation_master', $quotation);
@@ -121,16 +123,16 @@ class Quotation extends CI_Controller
 
             foreach ($data->cart as $cartProduct) {
                 $quotationDetails = array(
-                    'SaleMaster_IDNo' => $quotationId,
-                    'Product_IDNo' => $cartProduct->productId,
+                    'SaleMaster_IDNo'           => $quotationId,
+                    'Product_IDNo'              => $cartProduct->productId,
                     'SaleDetails_TotalQuantity' => $cartProduct->quantity,
-                    'SaleDetails_Rate' => $cartProduct->salesRate,
-                    'SaleDetails_TotalAmount' => $cartProduct->total,
-                    'Status' => 'a',
-                    'AddBy' => $this->session->userdata("FullName"),
-                    'AddTime' => date('Y-m-d H:i:s'),
-                    'SaleDetails_BranchId' => $this->session->userdata('BRANCHid'),
-                    'SaleDetails_Discount' => $cartProduct->discount
+                    'SaleDetails_Rate'          => $cartProduct->salesRate,
+                    'SaleDetails_TotalAmount'   => $cartProduct->total,
+                    'Status'                    => 'a',
+                    'AddBy'                     => $this->session->userdata("FullName"),
+                    'AddTime'                   => date('Y-m-d H:i:s'),
+                    'SaleDetails_BranchId'      => $this->session->userdata('BRANCHid'),
+                    'SaleDetails_Discount'      => $cartProduct->discountAmount
                 );
 
                 $this->db->insert('tbl_quotation_details', $quotationDetails);
@@ -175,6 +177,8 @@ class Quotation extends CI_Controller
                     qd.*,
                     p.Product_Code,
                     p.Product_Name,
+                    p.Guarantee,
+                    p.Warranty,
                     pc.ProductCategory_Name
                 from tbl_quotation_details qd
                 join tbl_product p on p.Product_SlNo = qd.Product_IDNo

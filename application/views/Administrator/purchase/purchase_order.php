@@ -216,7 +216,7 @@
 					<div class="modal-container">
 						<div class="modal-header">
 							<slot name="header">
-								<h3>IMEI Number Add</h3>
+								<h3>Serial Number Add</h3>
 							</slot>
 						</div>
 						<div class="modal-body" style="overflow: hidden; height: 100%; margin: -8px -14px -44px;">
@@ -392,9 +392,6 @@
 												<button type="button" id="show-modal" @click="serialShowModal" style="background: rgb(210, 0, 0);color: white;border: none;font-size: 15px;height: 24px;margin-left: 1px;"><i class="fa fa-plus"></i></button>
 											</div>
 										</div>
-
-
-
 									</div>
 								</div>
 
@@ -573,24 +570,43 @@
 									<input type="number" id="total" class="form-control" v-model="purchase.total" readonly />
 								</div>
 							</div>
+
+							
 							<div class="form-group">
-								<label class="col-xs-4 col-lg-12 control-label no-padding-right paid">Paid</label>
-								<div class="col-xs-8 col-lg-12 paid">
-									<input type="number" id="paid" class="form-control" v-model="purchase.paid" v-on:input="calculateTotal" />
+								<label class="col-xs-4 col-lg-12 control-label no-padding-right due">Cash Payment </label>
+								<div class="col-xs-8 col-lg-12 due">
+									<input type="number" id="cashPaid" class="form-control" v-model="purchase.cashPaid" v-on:input="calculateTotal" />
 								</div>
 							</div>
+							
+							<div class="form-group">
+								<label class="col-xs-4 col-lg-12 control-label no-padding-right due">Bank Payment </label>
+								<div class="col-xs-8 col-lg-12 due">
+									<input type="number" id="bankPaid" class="form-control" v-model="purchase.bankPaid" v-on:input="calculateTotal" />
+								</div>
+							</div>
+							
+							<div class="form-group" v-if="purchase.bankPaid > 0">
+								<label class="col-xs-4 col-lg-12 control-label no-padding-right due">Bank account </label>
+								<div class="col-xs-8 col-lg-12 due">
+									<v-select v-bind:options="filteredAccounts" v-model="selectedAccount" label="display_text" placeholder="Select account"></v-select>
+								</div>
+							</div>
+
 							<div class="form-group">
 								<label class="col-xs-4 col-lg-12 control-label no-padding-right due">Previous Due</label>
 								<div class="col-xs-8 col-lg-12 due">
-									<input type="number" id="previousDue" name="previousDue" class="form-control" v-model="purchase.previousDue" readonly style="color:red;" />
+								<input type="number" id="previousDue" class="form-control" v-model="purchase.previousDue" v-on:input="calculateTotal" />
 								</div>
 							</div>
+							
 							<div class="form-group">
 								<label class="col-xs-4 col-lg-12 control-label no-padding-right due">Due</label>
 								<div class="col-xs-8 col-lg-12 due">
 									<input type="number" id="due" name="due" class="form-control" v-model="purchase.due" readonly />
 								</div>
 							</div>
+
 							<div class="form-group">
 								<div class="col-xs-12 col-lg-12">
 									<input type="button" class="btn btn-success" value="Purchase" v-on:click="savePurchase" v-bind:disabled="purchaseOnProgress == true ? true : false" style="background:#000;color:#fff;padding:3px;margin-right: 15px;">
@@ -630,6 +646,9 @@
 					discount: 0.00,
 					freight: 0.00,
 					total: 0.00,
+					cashPaid: 0.00,
+					bankPaid: 0.00,
+					account_id: '',
 					paid: 0.00,
 					due: 0.00,
 					previousDue: 0.00,
@@ -641,6 +660,12 @@
 				get_imei_number: "",
 				vatPercent: 0.00,
 				branches: [],
+				selectedAccount : {
+					account_id : null,
+					account_name : '',
+					display_text: 'select account',
+				},
+				accounts: [],
 				selectedBranch: {
 					brunch_id: "<?php echo $this->session->userdata('BRANCHid'); ?>",
 					Brunch_name: "<?php echo $this->session->userdata('Brunch_name'); ?>"
@@ -679,10 +704,21 @@
 				userName: '<?php echo $this->session->userdata("FullName") ?>'
 			}
 		},
+
+		computed:{
+			filteredAccounts(){
+                let accounts = this.accounts.filter(account => account.status == '1');
+                return accounts.map(account => {
+                    account.display_text = `${account.account_name} - ${account.account_number} (${account.bank_name})`;
+                    return account;
+                })
+            }
+		},
 		created() {
 			this.getBranches();
 			this.getSuppliers();
 			this.getProducts();
+			this.getAccounts();
 
 			if (this.purchase.purchaseId != 0) {
 				this.getPurchase();
@@ -712,6 +748,13 @@
 			serialShowModal() {
 				this.serialModalStatus = true;
 			},
+
+			getAccounts(){
+                axios.get('/get_bank_accounts')
+                .then(res => {
+                    this.accounts = res.data;
+                })
+            },
 			serialHideModal() {
 				this.serialModalStatus = false;
 
@@ -744,8 +787,8 @@
 						await axios.post('/check_imei_number', {
 							get_imei_number: output[index]
 						}).then(res => {
-							if (res.data > 0) {
-								alert("Already Product Purchased !!");
+							if (res.data.row > 0) {
+								alert(`Already ${res.data.data[0].ps_imei_number} Purchased !!`);
 								return false;
 							} else {
 								let cartInd = this.imei_cart.findIndex(p => p.imeiNumber == output[index].trim());
@@ -759,7 +802,7 @@
 										categoryId: this.selectedProduct.ProductCategory_ID,
 										categoryName: this.selectedProduct.ProductCategory_Name,
 										purchaseRate: this.selectedProduct.Product_Purchase_Rate,
-										salesRate: this.selectedProduct.Product_SellingPrice,
+										purchaseRate: this.selectedProduct.Product_SellingPrice,
 										// quantity: this.selectedProduct.quantity,
 										// total: this.selectedProduct.total,
 										imeiNumber: output[index]
@@ -805,7 +848,7 @@
 					// 		categoryId: this.selectedProduct.ProductCategory_ID,
 					// 		categoryName: this.selectedProduct.ProductCategory_Name,
 					// 		purchaseRate: this.selectedProduct.Product_Purchase_Rate,
-					// 		salesRate: this.selectedProduct.Product_SellingPrice,
+					// 		purchaseRate: this.selectedProduct.Product_SellingPrice,
 					// 		quantity: this.selectedProduct.quantity,
 					// 		total: this.selectedProduct.total,
 					// 		imeiNumber: this.get_imei_number
@@ -836,6 +879,12 @@
 					})
 				})
 			},
+			onChangeBank(){
+                // if (this.purchase.bankPaid == 0) {
+                //     this.selectedAccount = null
+                // }
+                this.calculateTotal();
+            },
 			getProducts() {
 				axios.post('/get_products', {
 					isService: 'false'
@@ -1015,15 +1064,56 @@
 				}
 			},
 			calculateTotal() {
+				
+				// this.purchase.subTotal = this.cart.reduce((prev, curr) => {
+				// 	return prev + parseFloat(curr.total);
+				// }, 0);
+				// this.purchase.vat = (this.purchase.subTotal * this.vatPercent) / 100;
+				// this.purchase.total = (parseFloat(this.purchase.subTotal) + parseFloat(this.purchase.vat) + parseFloat(this.purchase.freight)) - this.purchase.discount;
+
+				// if (this.selectedSupplier.Supplier_Type == 'G') {
+				// 	this.purchase.paid = (parseFloat(this.purchase.cashPaid) + parseFloat(this.purchase.bankPaid)).toFixed(2)
+                //     this.purchase.due = (parseFloat(this.purchase.total) - parseFloat(this.purchase.paid)).toFixed(2);
+				// } else{
+				// 	this.purchase.paid = (parseFloat(this.purchase.cashPaid) + parseFloat(this.purchase.bankPaid)).toFixed(2);
+                //     this.purchase.due = (parseFloat(this.purchase.total) - parseFloat(this.purchase.paid)).toFixed(2);
+				// }
+
+			
+
 				this.purchase.subTotal = this.cart.reduce((prev, curr) => {
-					return prev + parseFloat(curr.total);
-				}, 0);
-				this.purchase.vat = (this.purchase.subTotal * this.vatPercent) / 100;
-				this.purchase.total = (parseFloat(this.purchase.subTotal) + parseFloat(this.purchase.vat) + parseFloat(this.purchase.freight)) - this.purchase.discount;
-				if (this.selectedSupplier.Supplier_Type == 'G') {
-					this.purchase.paid = this.purchase.total;
-				}
-				this.purchase.due = this.purchase.total - this.purchase.paid;
+                return prev + parseFloat(curr.total);
+            }, 0);
+
+
+			this.purchase.vat = this.cart.reduce((prev, curr) => {
+                return +prev + +(curr.total * (curr.vat / 100))
+            }, 0);
+
+			if (event.target.id == 'discountPercent') {
+                this.purchase.discount = ((parseFloat(this.purchase.subTotal) * parseFloat(this.discountPercent)) /
+                    100).toFixed(2);
+            } else {
+                this.discountPercent = (parseFloat(this.purchase.discount) / parseFloat(this.purchase.subTotal) * 100)
+                    .toFixed(2);
+            }
+
+			this.purchase.total = parseFloat(this.purchase.subTotal).toFixed(2) - parseFloat(this.purchase.discount).toFixed(2);
+
+				console.log(this.purchase.total);
+
+            if (this.selectedSupplier.Supplier_Type == 'G') {
+                // this.sales.cashPaid = this.sales.total;
+                // this.sales.bankPaid = this.sales.total;
+                this.purchase.due = 0;
+            } else {
+                // if (event.target.id != 'cashPaid') {
+                //     this.sales.cashPaid = 0;
+                // }
+                this.purchase.due = parseFloat(this.purchase.total).toFixed(2) - parseFloat(this.purchase.cashPaid).toFixed(2) - parseFloat(
+                    this.purchase.bankPaid).toFixed(2);
+            }
+
 			},
 			savePurchase() {
 				if (this.selectedSupplier.Supplier_SlNo == null) {
@@ -1036,6 +1126,8 @@
 					return;
 				}
 
+
+
 				if (this.cart.length == 0) {
 					alert('Cart is empty');
 					return;
@@ -1043,6 +1135,7 @@
 
 				this.purchase.supplierId = this.selectedSupplier.Supplier_SlNo;
 				this.purchase.purchaseFor = this.selectedBranch.brunch_id;
+				this.purchase.account_id = this.selectedAccount != null && this.selectedAccount.account_id != '' ? this.selectedAccount.account_id : null;
 
 				this.purchaseOnProgress = true;
 
@@ -1050,6 +1143,7 @@
 					purchase: this.purchase,
 					cartProducts: this.cart
 				}
+
 
 				if (this.selectedSupplier.Supplier_Type == 'G') {
 					data.supplier = this.selectedSupplier;
@@ -1105,12 +1199,21 @@
 					this.purchase.freight = purchase.PurchaseMaster_Freight;
 					this.purchase.total = purchase.PurchaseMaster_TotalAmount;
 					this.purchase.paid = purchase.PurchaseMaster_PaidAmount;
+					this.purchase.cashPaid = purchase.PurchaseMaster_cashPaid;
+					this.purchase.bankPaid = purchase.PurchaseMaster_bankPaid;
 					this.purchase.due = purchase.PurchaseMaster_DueAmount;
 					this.purchase.previousDue = purchase.previous_due;
 					this.purchase.note = purchase.PurchaseMaster_Description;
+					this.selectedAccount.account_id = purchase.account_id;
 
 					this.oldSupplierId = purchase.Supplier_SlNo;
 					this.oldPreviousDue = purchase.previous_due;
+
+					this.selectedAccount = {
+					account_id : purchase.account_id,
+					account_name : purchase.account_name,
+					display_text: purchase.account_name,
+				},
 
 					this.vatPercent = (this.purchase.vat * 100) / this.purchase.subTotal;
 
@@ -1127,6 +1230,8 @@
 							discount: product.PurchaseDetails_Discount,
 							IMEICartStore: []
 						}
+
+
 
 
 						product.serial.forEach((obj) => {

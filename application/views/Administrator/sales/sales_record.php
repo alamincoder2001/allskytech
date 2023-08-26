@@ -148,12 +148,21 @@
     </div>
 
     <div class="row" style="margin-top:15px;display:none;" v-bind:style="{display: sales.length > 0 ? '' : 'none'}">
-        <div class="col-md-12" style="margin-bottom: 10px;">
+        <div class="col-md-6" style="margin-bottom: 10px;">
             <a href="" @click.prevent="print"><i class="fa fa-print"></i> Print</a>
         </div>
+
+        <div class="col-md-6" style="margin-bottom: 10px; display:none" v-if="(searchTypesForRecord.includes(searchType)) && recordType == 'without_details'" v-bind:style="{display: (searchTypesForRecord.includes(searchType)) && recordType == 'without_details' ? '' : 'none'}">
+            <div class="form-group" style="width:37%; float:right;">
+                <label for="filter" class="sr-only">Filter</label>
+                <input type="text" class="form-control" v-model="filter" placeholder="Search Record">
+            </div>
+        </div>
+
         <div class="col-md-12">
             <div class="table-responsive" id="reportContent">
-                <table class="record-table" v-if="(searchTypesForRecord.includes(searchType)) && recordType == 'with_details'" style="display:none" v-bind:style="{display: (searchTypesForRecord.includes(searchType)) && recordType == 'with_details' ? '' : 'none'}">
+
+                <table class="table table-striped table-bordered table-hover" v-if="(searchTypesForRecord.includes(searchType)) && recordType == 'with_details'" style="display:none" v-bind:style="{display: (searchTypesForRecord.includes(searchType)) && recordType == 'with_details' ? '' : 'none'}">
                     <thead>
                         <tr>
                             <th>SL No</th>
@@ -221,72 +230,71 @@
                     </tbody>
                 </table>
 
-                <table class="record-table" v-if="(searchTypesForRecord.includes(searchType)) && recordType == 'without_details'" style="display:none" v-bind:style="{display: (searchTypesForRecord.includes(searchType)) && recordType == 'without_details' ? '' : 'none'}">
-                    <thead>
+                <datatable :columns="columns" :data="sales" :filter-by="filter" v-if="(searchTypesForRecord.includes(searchType)) && recordType == 'without_details'" style="margin-bottom: 0; display:none; " v-bind:style="{display: (searchTypesForRecord.includes(searchType)) && recordType == 'without_details' ? '' : 'none'}">
+                    <template scope="{ row }">
                         <tr>
-                            <th>SL No.</th>
-                            <th>Invoice No.</th>
-                            <th>Date</th>
-                            <!-- <th>Area</th> -->
-                            <th>Customer Name</th>
-                            <th>Employee Name</th>
-                            <th>Saved By</th>
-                            <th>Sub Total</th>
-                            <th>VAT</th>
-                            <th>Discount</th>
-                            <th>Transport Cost</th>
-                            <th>Total</th>
-                            <th>Paid</th>
-                            <th>Due</th>
-                            <!-- <th>E. Com</th> -->
-                            <th>Note</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(sale,sl) in sales">
-                            <td>{{ sl + 1 }}</td>
-                            <td>{{ sale.SaleMaster_InvoiceNo }}</td>
-                            <td>{{ sale.SaleMaster_SaleDate }}</td>
-                            <!-- <td>{{ sale.area }}</td> -->
-                            <td>{{ sale.Customer_Name }}</td>
-                            <td>{{ sale.Employee_Name }}</td>
-                            <td>{{ sale.AddBy }}</td>
-                            <td style="text-align:right;">{{ sale.SaleMaster_SubTotalAmount }}</td>
-                            <td style="text-align:right;">{{ sale.SaleMaster_TaxAmount }}</td>
-                            <td style="text-align:right;">{{ sale.SaleMaster_TotalDiscountAmount }}</td>
-                            <td style="text-align:right;">{{ sale.SaleMaster_Freight }}</td>
-                            <td style="text-align:right;">{{ sale.SaleMaster_TotalSaleAmount }}</td>
-                            <td style="text-align:right;">{{ sale.SaleMaster_PaidAmount }}</td>
-                            <td style="text-align:right;">{{ sale.SaleMaster_DueAmount }}</td>
-                            <!-- <td style="text-align:right;">{{ ((sale.SaleMaster_TotalSaleAmount * sale.Commission) / 100).toFixed(2) }}</td> -->
-                            <td style="text-align:left;">{{ sale.SaleMaster_Description }}</td>
-                            <td style="text-align:center;">
-                                <a href="" title="Sale Invoice" v-bind:href="`/sale_invoice_print/${sale.SaleMaster_SlNo}`" target="_blank"><i class="fa fa-file"></i></a>
-                                <a href="" title="Chalan" v-bind:href="`/chalan/${sale.SaleMaster_SlNo}`" target="_blank"><i class="fa fa-file-o"></i></a>
+                            <td>{{ row.SaleMaster_InvoiceNo }}</td>
+                            <td>{{ row.SaleMaster_SaleDate }}</td>
+                            <td>{{ row.Customer_Name }}</td>
+                            <td>{{ row.Employee_Name }}</td>
+                            <td>{{ row.AddBy }}</td>
+                            <td>{{ row.SaleMaster_SubTotalAmount }}</td>
+                            <td>{{ row.SaleMaster_TaxAmount }}</td>
+                            <td>{{ row.SaleMaster_TotalDiscountAmount }}</td>
+                            <td>{{ row.SaleMaster_Freight }}</td>
+                            <td>{{ row.SaleMaster_TotalSaleAmount }}</td>
+                            <td>{{ row.SaleMaster_PaidAmount }}</td>
+                            <td>{{ row.SaleMaster_DueAmount }}</td>
+                            <td>{{ row.SaleMaster_Description }}</td>
+                            <td>
+                                <a href="" title="Sale Invoice" v-bind:href="`/sale_invoice_print/${row.SaleMaster_SlNo}`" target="_blank"><i class="fa fa-file"></i></a>
+                                <a href="" title="Chalan" v-bind:href="`/chalan/${row.SaleMaster_SlNo}`" target="_blank"><i class="fa fa-file-o"></i></a>
                                 <?php if ($this->session->userdata('accountType') != 'u') { ?>
-                                    <a href="" title="Edit Sale" v-bind:href="`/sales/${sale.is_service == 'true' ? 'service' : 'product'}/${sale.SaleMaster_SlNo}`"><i class="fa fa-edit"></i></a>
-                                    <a href="" title="Delete Sale" @click.prevent="deleteSale(sale.SaleMaster_SlNo)"><i class="fa fa-trash"></i></a>
+                                    <a href="" title="Edit Sale" v-bind:href="`/sales/${row.is_service == 'true' ? 'service' : 'product'}/${row.SaleMaster_SlNo}`"><i class="fa fa-edit"></i></a>
+                                    <a href="" title="Delete Sale" @click.prevent="deleteSale(row.SaleMaster_SlNo)"><i class="fa fa-trash"></i></a>
                                 <?php } ?>
                             </td>
                         </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr style="font-weight:bold;">
-                            <td colspan="6" style="text-align:right;">Total</td>
-                            <td style="text-align:right;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_SubTotalAmount)}, 0) }}</td>
-                            <td style="text-align:right;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_TaxAmount)}, 0) }}</td>
-                            <td style="text-align:right;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_TotalDiscountAmount)}, 0) }}</td>
-                            <td style="text-align:right;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_Freight)}, 0) }}</td>
-                            <td style="text-align:right;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_TotalSaleAmount)}, 0) }}</td>
-                            <td style="text-align:right;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_PaidAmount)}, 0) }}</td>
-                            <td style="text-align:right;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_DueAmount)}, 0) }}</td>
-                            <!-- <td style="text-align:right;">{{ (sales.reduce((prev, curr)=>{return prev + (parseFloat(curr.SaleMaster_TotalSaleAmount * curr.Commission)/100)}, 0)).toFixed(2) }}</td> -->
+                    </template>
+                </datatable>
+
+                <!-- <datatable :columns="allColumns" :data="rows">
+                    <template slot="footer" scope="{ rows }">
+                        <tr>
+                            <td colspan="5"><strong>Average Age:</strong></td>
                             <td></td>
                             <td></td>
+                            <td align="center"><strong>54405</strong></td>
+                            <td align="center"><strong>5440</strong></td>
+                            <td align="center"><strong>54450</strong></td>
+                            <td align="center"><strong>54450</strong></td>
+                            <td align="center"><strong>54450</strong></td>
+                            <td align="center"><strong>54450</strong></td>
+                            <td align="center"><strong>544050</strong></td>
+                            <td></td>
+                            <td></td>
+                  
+                        </tr>   
+                    </template>
+                </datatable> -->
+
+
+                <div style="width:90%; float:left;">
+                    <table border="1" style="width: 100%; border-color:#eaeaea; display:none" cellspadding="0" v-if="(searchTypesForRecord.includes(searchType)) && recordType == 'without_details'" v-bind:style="{display: (searchTypesForRecord.includes(searchType)) && recordType == 'without_details' ? '' : 'none'}">
+                        <tr>
+                            <td style="text-align:center; width:43%; font-weight:bold;">Total</td>
+                            <td style="text-align:center; width:5%;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_SubTotalAmount)}, 0) }}</td>
+                            <td style="text-align:center; width:4%;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_TaxAmount)}, 0) }}</td>
+                            <td style="text-align:center; width:6%;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_TotalDiscountAmount)}, 0) }}</td>
+                            <td style="text-align:center; width:9%;"> {{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_Freight)}, 0) }} </td>
+                            <td style="text-align:center; width:5%;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_TotalSaleAmount)}, 0) }}</td>
+                            <td style="text-align:center; width:5%;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_PaidAmount)}, 0) }}</td>
+                            <td style="text-align:center; width:5%;">{{ sales.reduce((prev, curr)=>{return prev + parseFloat(curr.SaleMaster_DueAmount)}, 0) }}</td>
                         </tr>
-                    </tfoot>
-                </table>
+                    </table>
+                </div>
+
+                <datatable-pager v-model="page" type="abbreviated" :per-page="per_page" style="margin-bottom: 50px;"></datatable-pager>
 
                 <template v-if="searchTypesForDetails.includes(searchType)" style="display:none;" v-bind:style="{display: searchTypesForDetails.includes(searchType) ? '' : 'none'}">
                     <table class="record-table" v-if="selectedProduct != null">
@@ -323,7 +331,7 @@
                         </tfoot>
                     </table>
 
-                    <table class="record-table" v-if="selectedProduct == null">
+                    <table class="table table-striped table-bordered table-hover" v-if="selectedProduct == null">
                         <thead>
                             <tr>
                                 <th>Product Id</th>
@@ -362,6 +370,7 @@
 <script src="<?php echo base_url(); ?>assets/js/vue/vue.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/vue/axios.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/vue/vue-select.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/vuejs-datatable.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/moment.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/lodash.min.js"></script>
 
@@ -373,7 +382,7 @@
             return {
                 searchType: '',
                 recordType: 'without_details',
-                dateFrom: moment().format('YYYY-MM-DD'),
+                dateFrom: '',
                 dateTo: moment().format('YYYY-MM-DD'),
                 customers: [],
                 selectedCustomer: null,
@@ -391,7 +400,87 @@
                 selectedBrand: null,
                 sales: [],
                 searchTypesForRecord: ['', 'customer', 'user', 'area', 'employee'],
-                searchTypesForDetails: ['quantity', 'category', 'brand']
+                searchTypesForDetails: ['quantity', 'category', 'brand'],
+
+                columns: [{
+                        label: 'Invoice No.',
+                        field: 'SaleMaster_InvoiceNo',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Date',
+                        field: 'SaleMaster_SaleDate',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Customer Name',
+                        field: 'Customer_Name',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Employee Name',
+                        field: 'Employee_Name',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Saved By',
+                        field: 'AddBy',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Sub Total',
+                        field: '',
+                        align: 'center'
+                    },
+                    {
+                        label: 'VAT',
+                        field: 'SaleMaster_TaxAmount',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Discount',
+                        field: 'SaleMaster_TotalDiscountAmount',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Transport Cost',
+                        field: 'SaleMaster_Freight',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Total',
+                        field: 'SaleMaster_TotalSaleAmount',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Paid',
+                        field: 'SaleMaster_PaidAmount',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Due',
+                        field: 'SaleMaster_DueAmount',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Note',
+                        field: 'SaleMaster_Description',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Action',
+                        align: 'center',
+                        filterable: false
+                    }
+                ],
+                allColumns: [],
+                rows: {
+                    user: 'tarekul',
+                    id: 1
+                },
+                page: 1,
+                per_page: 10,
+                filter: '',
             }
         },
         created() {
@@ -492,12 +581,16 @@
 
             },
             getSalesRecord() {
+
+                const dateFrom = new Date();
+                dateFrom.setDate(dateFrom.getDate() - 30);
+
                 let filter = {
                     userFullName: this.selectedUser == null || this.selectedUser.FullName == '' ? '' : this.selectedUser.FullName,
                     customerId: this.selectedCustomer == null || this.selectedCustomer.Customer_SlNo == '' ? '' : this.selectedCustomer.Customer_SlNo,
                     areaId: this.selectedArea == null || this.selectedArea.District_SlNo == '' ? '' : this.selectedArea.District_SlNo,
                     employeeId: this.selectedEmployee == null || this.selectedEmployee.Employee_SlNo == '' ? '' : this.selectedEmployee.Employee_SlNo,
-                    dateFrom: this.dateFrom,
+                    dateFrom: this.dateFrom != null ? this.dateFrom : dateFrom,
                     dateTo: this.dateTo
                 }
 

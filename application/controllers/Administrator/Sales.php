@@ -268,35 +268,42 @@ class Sales extends CI_Controller
         }
 
         $serialIMEIs = $this->db->query("SELECT
-        psn.*, 
-        p.Product_Name,
-        p.Product_Code,
-        sd.SaleDetails_Rate,
-        sd.SaleDetails_Rate as sale_return_amount,
-        sd.SaleMaster_IDNo,
-        sm.SaleMaster_InvoiceNo,
-        sm.SalseCustomer_IDNo,
-        sm.SaleMaster_SaleDate,
-        pm.PurchaseMaster_InvoiceNo,
-        pm.PurchaseMaster_OrderDate,
-        s.Supplier_Code,
-        s.Supplier_Name,
-        s.Supplier_Mobile,
-        c.Customer_Code,
-        c.Customer_Name,
-        c.Customer_Mobile
-        FROM tbl_product_serial_numbers psn
-        left join tbl_product p on p.Product_SlNo = psn.ps_prod_id
-        left join tbl_saledetails sd on sd.SaleDetails_SlNo = psn.sales_details_id
-        left join tbl_salesmaster sm on sm.SaleMaster_SlNo = sd.SaleMaster_IDNo
-        left join tbl_purchasedetails pd on pd.PurchaseDetails_SlNo = psn.purchase_details_id
-        left join tbl_purchasemaster pm on pm.PurchaseMaster_SlNo = pd.PurchaseMaster_IDNo
-        left join tbl_supplier s on s.Supplier_SlNo = psn.ps_purchase_supp_id
-        left join tbl_customer c on c.Customer_SlNo = sm.SalseCustomer_IDNo
-        WHERE psn.ps_s_status = 'yes'
-        and psn.ps_s_r_status = 'no'
-        $clauses
-        and psn.ps_brunch_id = ? ", $this->session->userdata('BRANCHid'))->result();
+            psn.*, 
+            p.Product_Name,
+            p.Product_Code,
+            p.Warranty,
+            sd.SaleDetails_Rate,
+            sd.SaleDetails_Rate as sale_return_amount,
+            sd.SaleMaster_IDNo,
+            sm.SaleMaster_InvoiceNo,
+            sm.SalseCustomer_IDNo,
+            sm.SaleMaster_SaleDate,
+            pm.PurchaseMaster_InvoiceNo,
+            pm.PurchaseMaster_OrderDate,
+            s.Supplier_Code,
+            s.Supplier_Name,
+            s.Supplier_Mobile,
+            c.Customer_Code,
+            c.Customer_Name,
+            c.Customer_Mobile
+            FROM tbl_product_serial_numbers psn
+            left join tbl_product p on p.Product_SlNo = psn.ps_prod_id
+            left join tbl_saledetails sd on sd.SaleDetails_SlNo = psn.sales_details_id
+            left join tbl_salesmaster sm on sm.SaleMaster_SlNo = sd.SaleMaster_IDNo
+            left join tbl_purchasedetails pd on pd.PurchaseDetails_SlNo = psn.purchase_details_id
+            left join tbl_purchasemaster pm on pm.PurchaseMaster_SlNo = pd.PurchaseMaster_IDNo
+            left join tbl_supplier s on s.Supplier_SlNo = psn.ps_purchase_supp_id
+            left join tbl_customer c on c.Customer_SlNo = sm.SalseCustomer_IDNo
+            WHERE psn.ps_s_status = 'yes'
+            and psn.ps_s_r_status = 'no'
+            $clauses
+            and psn.ps_brunch_id = ? 
+        ", $this->session->userdata('BRANCHid'))->result();
+
+        foreach ($serialIMEIs as $key => $value) {
+            // $value->waranty_end_date =  ' + ' . $value->Warranty . ' days';
+            $value->waranty_end_date =  date('Y-m-d', strtotime($value->SaleMaster_SaleDate . ' + ' . $value->Warranty . ' days'));
+        }
 
         echo json_encode($serialIMEIs);
     }

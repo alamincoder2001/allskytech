@@ -46,18 +46,42 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(product, sl) in cart">
+                                <!-- <tr v-for="(product, sl) in cart">
                                     <td>{{ sl + 1 }}</td>
                                     <td>{{ product.Product_Name }}
-                                        <br><span
-                                            v-for="(IMEI, ind) in product.imei.filter(sl => sl.sales_details_id == product.SaleDetails_SlNo) ">
+                                        <br><span v-for="(IMEI, ind) in product.imei.filter(sl => sl.sales_details_id == product.SaleDetails_SlNo) ">
                                             {{IMEI.ps_imei_number}} <span>,</span>
                                         </span>
                                     </td>
                                     <td>
                                         {{ product.SaleDetails_TotalQuantity }}
                                     </td>
-                                </tr>
+                                </tr> -->
+
+                                <template v-for="(product, sl) in cart">
+                                    <tr v-if="product.imei.length > 140">
+                                        <td>{{ sl + 1 }}</td>
+                                        <td v-if="product.imei.length > 0">{{ product.Product_Name }} <br>
+                                            ({{ product.imei.slice(0,140).map(obj => obj.ps_imei_number).join(', ') }}
+                                        </td>
+                                        <td v-else>{{ product.Product_Name }}</td>
+                                        <td>{{ product.SaleDetails_TotalQuantity }}</td>
+                                    </tr>
+                                    <tr v-if="product.imei.length > 140">
+                                        <td></td>
+                                        <td>{{ product.imei.slice(141,10000).map(obj => obj.ps_imei_number).join(', ') }})
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr v-if="product.imei.length < 140">
+                                        <td>{{ sl + 1 }}</td>
+                                        <td v-if="product.imei.length > 0">{{ product.Product_Name }} <br>
+                                            ({{ product.imei.map(obj => obj.ps_imei_number).join(', ') }}
+                                        </td>
+                                        <td v-else>{{ product.Product_Name }}</td>
+                                        <td>{{ product.SaleDetails_TotalQuantity }}</td>
+                                    </tr>
+                                </template>
 
                                 <tr>
                                     <td></td>
@@ -85,66 +109,66 @@
 <script src="<?php echo base_url(); ?>assets/js/moment.min.js"></script>
 
 <script>
-new Vue({
-    el: '#chalan',
-    data() {
-        return {
-            sales: {
-                SaleMaster_SlNo: parseInt('<?php echo $saleId;?>'),
-                SaleMaster_InvoiceNo: null,
-                SalseCustomer_IDNo: null,
-                SaleMaster_SaleDate: null,
-                Customer_Name: null,
-                Customer_Address: null,
-                Customer_Mobile: null,
-                SaleMaster_TotalSaleAmount: null,
-                SaleMaster_TotalDiscountAmount: null,
-                SaleMaster_TaxAmount: null,
-                SaleMaster_Freight: null,
-                SaleMaster_SubTotalAmount: null,
-                SaleMaster_PaidAmount: null,
-                SaleMaster_DueAmount: null,
-                SaleMaster_Previous_Due: null,
-                SaleMaster_Description: null,
-                AddBy: null
+    new Vue({
+        el: '#chalan',
+        data() {
+            return {
+                sales: {
+                    SaleMaster_SlNo: parseInt('<?php echo $saleId; ?>'),
+                    SaleMaster_InvoiceNo: null,
+                    SalseCustomer_IDNo: null,
+                    SaleMaster_SaleDate: null,
+                    Customer_Name: null,
+                    Customer_Address: null,
+                    Customer_Mobile: null,
+                    SaleMaster_TotalSaleAmount: null,
+                    SaleMaster_TotalDiscountAmount: null,
+                    SaleMaster_TaxAmount: null,
+                    SaleMaster_Freight: null,
+                    SaleMaster_SubTotalAmount: null,
+                    SaleMaster_PaidAmount: null,
+                    SaleMaster_DueAmount: null,
+                    SaleMaster_Previous_Due: null,
+                    SaleMaster_Description: null,
+                    AddBy: null
+                },
+                cart: [],
+                style: null,
+                companyProfile: null,
+                currentBranch: null
+            }
+        },
+        created() {
+            this.setStyle();
+            this.getSales();
+            this.getCompanyProfile();
+            this.getCurrentBranch();
+        },
+        methods: {
+            getSales() {
+                axios.post('/get_sales', {
+                    salesId: this.sales.SaleMaster_SlNo
+                }).then(res => {
+                    this.sales = res.data.sales[0];
+                    this.cart = res.data.saleDetails;
+                })
             },
-            cart: [],
-            style: null,
-            companyProfile: null,
-            currentBranch: null
-        }
-    },
-    created() {
-        this.setStyle();
-        this.getSales();
-        this.getCompanyProfile();
-        this.getCurrentBranch();
-    },
-    methods: {
-        getSales() {
-            axios.post('/get_sales', {
-                salesId: this.sales.SaleMaster_SlNo
-            }).then(res => {
-                this.sales = res.data.sales[0];
-                this.cart = res.data.saleDetails;
-            })
-        },
-        getCompanyProfile() {
-            axios.get('/get_company_profile').then(res => {
-                this.companyProfile = res.data;
-            })
-        },
-        getCurrentBranch() {
-            axios.get('/get_current_branch').then(res => {
-                this.currentBranch = res.data;
-            })
-        },
-        formatDateTime(datetime, format) {
-            return moment(datetime).format(format);
-        },
-        setStyle() {
-            this.style = document.createElement('style');
-            this.style.innerHTML = `
+            getCompanyProfile() {
+                axios.get('/get_company_profile').then(res => {
+                    this.companyProfile = res.data;
+                })
+            },
+            getCurrentBranch() {
+                axios.get('/get_current_branch').then(res => {
+                    this.currentBranch = res.data;
+                })
+            },
+            formatDateTime(datetime, format) {
+                return moment(datetime).format(format);
+            },
+            setStyle() {
+                this.style = document.createElement('style');
+                this.style.innerHTML = `
                 div[_h098asdh]{
                     background-color:#e0e0e0;
                     font-weight: bold;
@@ -175,10 +199,10 @@ new Vue({
                     padding: 2px;
                 }
             `;
-            document.head.appendChild(this.style);
-        },
-        async print() {
-            let reportContent = `
+                document.head.appendChild(this.style);
+            },
+            async print() {
+                let reportContent = `
 					<div class="container">
 						<div class="row">
 							<div class="col-xs-12">
@@ -188,29 +212,29 @@ new Vue({
 					</div>
 				`;
 
-            var reportWindow = window.open('', 'PRINT', `height=${screen.height}, width=${screen.width}`);
-            reportWindow.document.write(`
+                var reportWindow = window.open('', 'PRINT', `height=${screen.height}, width=${screen.width}`);
+                reportWindow.document.write(`
 					<?php $this->load->view('Administrator/reports/reportHeader.php'); ?>
 				`);
 
-            reportWindow.document.body.innerHTML += reportContent;
+                reportWindow.document.body.innerHTML += reportContent;
 
-            if (this.searchType == '' || this.searchType == 'user') {
-                let rows = reportWindow.document.querySelectorAll('.record-table tr');
-                rows.forEach(row => {
-                    row.lastChild.remove();
-                })
+                if (this.searchType == '' || this.searchType == 'user') {
+                    let rows = reportWindow.document.querySelectorAll('.record-table tr');
+                    rows.forEach(row => {
+                        row.lastChild.remove();
+                    })
+                }
+
+                let invoiceStyle = reportWindow.document.createElement('style');
+                invoiceStyle.innerHTML = this.style.innerHTML;
+                reportWindow.document.head.appendChild(invoiceStyle);
+
+                reportWindow.focus();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                reportWindow.print();
+                reportWindow.close();
             }
-
-            let invoiceStyle = reportWindow.document.createElement('style');
-            invoiceStyle.innerHTML = this.style.innerHTML;
-            reportWindow.document.head.appendChild(invoiceStyle);
-
-            reportWindow.focus();
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            reportWindow.print();
-            reportWindow.close();
         }
-    }
-})
+    })
 </script>

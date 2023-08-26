@@ -9,7 +9,7 @@
         <div class="row" style="margin-top:15px;">
             <div class="col-md-12">
                 <div class="table-responsive" id="printContent">
-                    <table class="table table-bordered table-condensed">
+                    <table class="table table-striped table-bordered table-hover">
                         <thead>
                             <th>Sl</th>
                             <th>Customer Id</th>

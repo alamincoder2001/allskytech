@@ -39,7 +39,7 @@ const salesInvoice = Vue.component("sales-invoice", {
                             <thead>
                                 <tr>
                                     <td>Sl.</td>
-                                    <td>Description</td>
+                                    <td style="width:50%;">Description</td>
                                     <td style="width:10%;">G / W</td>
                                     <td>Qnty</td>
                                     <td>Unit Price</td>
@@ -48,32 +48,62 @@ const salesInvoice = Vue.component("sales-invoice", {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(product, sl) in cart">
-                                    <td>{{ sl + 1 }}</td>
-                                    
-                                    <td v-if="product.imei.length > 0">{{ product.Product_Name }} ({{ product.varient_name }})<br>
-                                    ({{ product.imei.map(obj => obj.ps_imei_number).join(', ') }})
-                                    </td>
+                                <template v-for="(product, sl) in cart">
+                                    <tr v-if="product.imei.length > 99" style="border-bottom:none;">
+                                        <td>{{ sl + 1 }}</td>
+                                        
+                                        <td v-if="product.imei.length > 0" id="fontSize">{{ product.Product_Name }} ({{ product.varient_name }})<br>
+                                        ({{ product.imei.slice(0,99).map(obj => obj.ps_imei_number).join(', ') }})
+                                        </td>
+                                        <td>G - {{ product.Guarantee }} days <br>
+                                        W - {{ product.Warranty }} days</td>
+                                        <td>{{ product.SaleDetails_TotalQuantity }}</td>
+                                        <td>{{ product.SaleDetails_Rate }}</td>
+                                        <td>{{ product.SaleDetails_Discount }}</td>
+                                        <td align="right">{{ product.SaleDetails_TotalAmount }}</td>
+                                    </tr>
+                                    <tr v-if="product.imei.length > 99">
+                                        <td></td>                                        
+                                        <td>({{ product.imei.slice(99,10000).map(obj => obj.ps_imei_number).join(', ') }})</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td align="right"></td>
+                                    </tr>
 
-                                    <td v-else>{{ product.Product_Name }} ({{ product.varient_name }})</td>
+                                    <tr v-if="product.imei.length < 140">
+                                        <td>{{ sl + 1 }}</td>
+                                        
+                                        <td v-if="product.imei.length > 0" id="fontSize">{{ product.Product_Name }} ({{ product.varient_name }})<br>
+                                        ({{ product.imei.map(obj => obj.ps_imei_number).join(', ') }})
+                                        </td>
 
-                                    <td>G - {{ product.Guarantee }} days <br>
-                                    W - {{ product.Warranty }} days</td>
-                                    <td>{{ product.SaleDetails_TotalQuantity }}</td>
-                                    <td>{{ product.SaleDetails_Rate }}</td>
-                                    <td>{{ product.SaleDetails_Discount }}</td>
-                                    <td align="right">{{ product.SaleDetails_TotalAmount }}</td>
-                                </tr>
+                                        <td v-else>{{ product.Product_Name }} ({{ product.varient_name }})</td>
 
-                                <tr> 
-                                    <td></td>
-                                    <td colspan="2">Total : </td>
-                                    <td>{{ cart.reduce((pre,next)=>{  return pre+ parseFloat(next.SaleDetails_TotalQuantity) },0) }}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
+                                        <td>G - {{ product.Guarantee }} days <br>
+                                        W - {{ product.Warranty }} days</td>
+                                        <td>{{ product.SaleDetails_TotalQuantity }}</td>
+                                        <td>{{ product.SaleDetails_Rate }}</td>
+                                        <td>{{ product.SaleDetails_Discount }}</td>
+                                        <td align="right">{{ product.SaleDetails_TotalAmount }}</td>
+                                    </tr>
+
+                                    <tr> 
+                                        <td></td>
+                                        <td colspan="2">Total : </td>
+                                        <td>{{ cart.reduce((pre,next)=>{  return pre+ parseFloat(next.SaleDetails_TotalQuantity) },0) }}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>   
+                                </template>
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6" style="border:none;"></td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -151,6 +181,12 @@ const salesInvoice = Vue.component("sales-invoice", {
                         <p style="white-space: pre-line">{{ sales.SaleMaster_Description }}</p>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-xs-12" style="border:1px solid green; border-radius:5px; padding:5px; width:50%;">
+                        <strong style="font-size:18px; font-weight:bold; color:green;"> Invoice Link :- </strong> <span style="font-size:14px; font-weight:bold; color:ciyan;"> https://pos.aallskytech.com/invoice/{{ sales.SaleMaster_SlNo }} </span>
+                    </div>
+                </div>
             </div>
         </div>
     `,
@@ -218,7 +254,6 @@ const salesInvoice = Vue.component("sales-invoice", {
                 }
                 div[_d9283dsc]{
                     padding-bottom:25px;
-                    border-bottom: 1px solid #484848;
                     margin-bottom: 15px;
                 }
                 table[_a584de]{
@@ -231,12 +266,18 @@ const salesInvoice = Vue.component("sales-invoice", {
                 table[_a584de] td{
                     padding: 3px;
                     border: 1px solid #484848;
+                    vertical-align: baseline;
                 }
                 table[_t92sadbc2]{
                     width: 100%;
                 }
                 table[_t92sadbc2] td{
                     padding: 2px;
+                }
+                @media print() {
+                    #fontSize {
+                        font-size: 8px !important;
+                    }
                 }
             `;
       document.head.appendChild(this.style);
@@ -357,7 +398,7 @@ const salesInvoice = Vue.component("sales-invoice", {
                         </head>
                         <body>
                             <div style="text-align:center;">
-                                <img src="/uploads/company_profile_thum/${this.currentBranch.Company_Logo_thum}" alt="Logo" style="height:80px;margin:0px;" /><br>
+                                <img src="/uploads/company_profile_thum/${this.currentBranch.Company_Logo_thum}" alt="Logo" style="height:180px;margin:0px;" /><br>
                                 <strong style="font-size:18px;">${this.currentBranch.Company_Name}</strong><br>
                                 <p style="white-space:pre-line;">${this.currentBranch.Repot_Heading}</p>
                             </div>
@@ -435,7 +476,7 @@ const salesInvoice = Vue.component("sales-invoice", {
                         </div>
                     </body>
                     </html>
-				`);
+                `);
       } else {
         printWindow.document.write(`
                 <!DOCTYPE html>
@@ -451,24 +492,36 @@ const salesInvoice = Vue.component("sales-invoice", {
                               font-size: 13px;
                               margin:0px auto !important;
                           }
+
+                  .logo{
+                    width: 30%;
+                    float:left;
+                    overflow:hidden;
+                }
+
+                .logo img{
+                    margin-left:55px;
+                }
+
+                .heading {
+                    width: 70%;
+                    float:left;
+                    padding-top:25px;
+                }
                       </style>
                   </head>
                   <body>
                       <div class="container">
                         <div class="row">
-                            <div class="col-xs-2" style="margin-top:-10px;">
-                              <img src="/uploads/company_profile_thum/${
-                                this.currentBranch.Company_Logo_thum
-                              }" alt="Logo" style="height:110px;" />
-                            </div>
-                            <div class="col-xs-10" style="padding-top:0px;">
-                                <span style="font-size:18px;">AALL SKY TECH LTD</span><br>
+                            <div class="logo"><img src="/uploads/company_profile_thum/${
+                              this.currentBranch.Company_Logo_thum
+                            }" alt="Logo" style="height:138px; width:170px;" /></div>
+                            <div class="heading">
+                            <span style="font-size:18px;">AALL SKY TECH LTD</span><br>
                                 <span style="font-size:18px;">${
                                   this.currentBranch.Company_Name
                                 }</span><br>
-                                <p style="white-space:pre-line;">${
-                                  this.currentBranch.Repot_Heading
-                                }</p>
+                                ${this.currentBranch.Repot_Heading}
                             </div>
                         </div>
                         <div class="row">
@@ -481,36 +534,32 @@ const salesInvoice = Vue.component("sales-invoice", {
                             <div class="row">
                                 <div class="col-xs-12">
                                     ${invoiceContent}
+                                    <div class="container" style="margin-top:80px;width:100%;">
+                                        <div class="row" style="margin-bottom:5px;padding-bottom:6px;">
+                                            <div class="col-xs-6">
+                                                <span style="text-decoration:overline;">Received by</span>                        
+                                            </div>
+                                            <div class="col-xs-6 text-right">
+                                                <span style="text-decoration:overline;">Authorized Signature</span>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="font-size:12px;border-top:1px solid #ccc;">
+                                            <div class="col-xs-6">                        
+                                            ** THANK YOU FOR YOUR BUSINESS **
+                                            </div>
+                                            <div class="col-xs-6 text-right">
+                                            Print Date: ${moment().format(
+                                              "DD-MM-YYYY h:mm a"
+                                            )}, Printed by: ${this.sales.AddBy}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="container" style="position:sticky-top;bottom:15px;width:100%;margin-top:50px;">
-                            <div class="row" style="border-bottom:1px solid #484848;margin-bottom:5px;padding-bottom:6px;">
-                                <div class="col-xs-6">
-                                    <span style="text-decoration:overline;">Received by</span><br><br>
-                                </div>
-                                <div class="col-xs-6 text-right">
-                                    <span style="text-decoration:overline;">Authorized Signature</span>
-                                </div>
-                                <div class="col-xs-12 text-center">
-                                    ** THANK YOU FOR YOUR BUSINESS **
-                                </div>
-                            </div>
-
-                            <div class="row" style="font-size:12px;">
-                                <div class="col-xs-12 text-center">
-                                    Print Date: ${moment().format(
-                                      "DD-MM-YYYY h:mm a"
-                                    )}, Printed by: ${this.sales.AddBy}
-                                </div>
-                              <!--  <div class="col-xs-6 text-right">
-                                    Developed by: Link-Up Technologoy, Contact no: 01911978897
-                                </div> -->
-                            </div>
-                        </div>
+                        </div>                        
                     </body>
                 </html>
-				`);
+                `);
       }
       let invoiceStyle = printWindow.document.createElement("style");
       invoiceStyle.innerHTML = this.style.innerHTML;

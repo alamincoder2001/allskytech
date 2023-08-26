@@ -30,7 +30,7 @@
     }
 
     .v-select .vs__actions {
-        margin-top: -5px;
+        margin-top: -3px;
     }
 
     .v-select .dropdown-menu {
@@ -85,6 +85,23 @@
                         <v-select v-bind:options="months" label="month_name" v-model="selectedMonth" @input="getPayableSalary" style="display:none;" v-bind:style="{display: months.length > 0 ? '' : 'none'}"></v-select>
                     </div>
                     <div class="col-md-1" style="padding:0;margin-left: -15px;"><a href="/month" target="_blank" class="add-button"><i class="fa fa-plus"></i></a></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Payment Type</label>
+                    <div class="col-md-7">
+                        <select class="form-control" v-model="payment.payment_by" required style="height:27px;">
+                            <option value="cash">Cash</option>
+                            <option value="bank">Bank</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="display:none;" v-bind:style="{display: payment.payment_by == 'bank' ? '' : 'none'}">
+                    <label class="col-md-4 control-label">Bank Account</label>
+                    <div class="col-md-7">
+                        <v-select v-bind:options="filteredAccounts" v-model="selectedAccount" label="display_text" placeholder="Select account"></v-select>
+                    </div>
                 </div>
 
                 <div class="form-group" style="display:none;" v-bind:style="{display: payment.employee_payment_id == null ? '' : 'none'}">
@@ -151,6 +168,10 @@
                             <td>{{ row.description }}</td>
                             <td>{{ row.User_Name }}</td>
                             <td>
+                                <button type="button" class="button edit" @click="openInvoice(row.employee_payment_id)">
+                                    <i class="fa fa-file"></i>
+                                </button>
+                                <!-- <a href="" class="btn" title="Invoice" v-bind:href="`/salary_payment_print/${row.employee_payment_id}`" target="_blank"><i class="fa fa-file"></i></a> -->
                                 <?php if ($this->session->userdata('accountType') != 'u') { ?>
                                     <button type="button" class="button edit" @click="editPayment(row)">
                                         <i class="fa fa-pencil"></i>
@@ -186,13 +207,21 @@
                     Employee_SlNo: null,
                     payment_date: moment().format('YYYY-MM-DD'),
                     month_id: null,
+                    account_id: null,
                     payment_amount: '',
                     deduction_amount: '',
                     description: '',
-                    payment_for: 'salary'
+                    payment_by: 'cash',
+                    payment_for: 'salary',
                 },
                 payments: [],
                 employees: [],
+                selectedAccount: {
+                    account_id: null,
+                    account_name: '',
+                    display_text: 'select account',
+                },
+                accounts: [],
                 selectedEmployee: null,
                 months: [],
                 selectedMonth: null,
@@ -250,10 +279,22 @@
                 filter: ''
             }
         },
+
+        computed: {
+            filteredAccounts() {
+                let accounts = this.accounts.filter(account => account.status == '1');
+                return accounts.map(account => {
+                    account.display_text =
+                        `${account.account_name} - ${account.account_number} (${account.bank_name})`;
+                    return account;
+                })
+            }
+        },
         created() {
             this.getEmployees();
             this.getMonths();
             this.getPayments();
+            this.getAccounts();
         },
         methods: {
             getEmployees() {
@@ -265,6 +306,13 @@
                 axios.get('/get_months').then(res => {
                     this.months = res.data;
                 })
+            },
+
+            getAccounts() {
+                axios.get('/get_bank_accounts')
+                    .then(res => {
+                        this.accounts = res.data;
+                    })
             },
 
             getPayableSalary() {
@@ -298,8 +346,14 @@
                     return;
                 }
 
+                if (this.payment.payment_by == 'bank' && this.selectedAccount == null) {
+                    alert('select bank account');
+                    return;
+                }
+
                 this.payment.Employee_SlNo = this.selectedEmployee.Employee_SlNo;
                 this.payment.month_id = this.selectedMonth.month_id;
+                this.payment.account_id = this.selectedAccount != null && this.selectedAccount.account_id != '' ? this.selectedAccount.account_id : null;
 
                 let url = '/add_employee_payment';
                 if (this.payment.employee_payment_id != null) {
@@ -328,10 +382,24 @@
                     salary_range: payment.salary_range
                 }
 
+
+                this.payment.payment_by = payment.payment_by;
+
+                if (this.payment.payment_by == 'bank') {
+                    this.selectedAccount = {
+                        account_id: payment.account_id,
+                        account_name: payment.account_name,
+                        display_text: payment.display_text,
+                    }
+                }
+
+
                 this.selectedMonth = {
                     month_id: payment.month_id,
                     month_name: payment.month_name
                 }
+
+
             },
             deletePayment(paymentId) {
                 let confirmation = confirm('Are you sure?');
@@ -348,6 +416,9 @@
                             this.getPayments();
                         }
                     })
+            },
+            openInvoice(paymentId) {
+                window.open('/salary_payment_print/' + paymentId, '_blank')
             },
             resetForm() {
                 this.payment = {

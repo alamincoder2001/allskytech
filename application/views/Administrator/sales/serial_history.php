@@ -137,36 +137,44 @@
                     <tbody>
                         <tr>
                             <th>Customer Name</th>
-                            <td>{{iemi_histories.Customer_Name}}</td>
+                            <td colspan="2">{{iemi_histories.Customer_Name}}</td>
                         </tr>
 
                         <tr>
                             <th>Customer Code</th>
-                            <td>{{iemi_histories.Customer_Code}}</td>
+                            <td colspan="2">{{iemi_histories.Customer_Code}}</td>
                         </tr>
 
                         <tr>
                             <th> Customer Mobile</th>
-                            <td> {{iemi_histories.Customer_Mobile}}</td>
+                            <td colspan="2"> {{iemi_histories.Customer_Mobile}}</td>
                         </tr>
 
                         <tr>
                             <th>Product Code</th>
-                            <td>{{iemi_histories.Product_Code}}</td>
+                            <td colspan="2">{{iemi_histories.Product_Code}}</td>
                         </tr>
 
                         <tr>
                             <th>Product Name</th>
-                            <td>{{iemi_histories.Product_Name}}</td>
+                            <td colspan="2">{{iemi_histories.Product_Name}}</td>
                         </tr>
 
                         <tr>
                             <th>Sales Invoice</th>
-                            <td>{{iemi_histories.SaleMaster_InvoiceNo}}</td>
+                            <td colspan="2">{{iemi_histories.SaleMaster_InvoiceNo}}</td>
                         </tr>
                         <tr>
                             <th> Sale Date </th>
-                            <td> {{iemi_histories.SaleMaster_SaleDate}}</td>
+                            <td colspan="2"> {{iemi_histories.SaleMaster_SaleDate}}</td>
+                        </tr>
+                        <tr>
+                            <th> Expired Date </th>
+                            <td> {{iemi_histories.waranty_end_date}}</td>
+                            <td>
+                                <button v-if="today > iemi_histories.waranty_end_date" style="background: red;border: none;color: white;border-radius: 2px;">Expired</button>
+                                <button v-else style="background: #025568;border: none;color: white;border-radius: 2px;">Still under warranty</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -190,6 +198,7 @@
                 selectedIEMI: null,
                 showTable: false,
                 iemi_histories: [],
+                today: moment().format('YYYY-MM-DD'),
             }
         },
         created() {

@@ -8,9 +8,11 @@ $db['default'] = array(
 
 	'username' => 'root',
 	'password' => '',
-	// 'username' => 'bigektuw',
-	// 'password' => 'sChzA2HnVel0',
-	'database' => 'bigektuw_allsky_tech',
+	'database' => 'aallskyt_allsky_tech_pos',
+
+	// 'username' => 'aallskyt_pos_user',
+	// 'password' => '[[ILvJt6d74y',
+	// 'database' => 'aallskyt_allsky_tech_pos',
 
 
 	'dbdriver' => 'mysqli',

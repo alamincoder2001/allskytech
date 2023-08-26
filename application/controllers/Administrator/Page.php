@@ -1257,4 +1257,64 @@ class Page extends CI_Controller
         echo "Success";
     }
     // ---------------------------------------------------
+
+
+    // payment term
+    public function getpaymentTerm()
+    {
+        $id = $this->input->post('id');
+        $clause = "";
+        if (!empty($id)) {
+            $clause .= " and id = '$id'";
+        }
+        $terms = $this->db->query("select * from tbl_payment_term where Status = 'a' $clause")->result();
+        echo json_encode($terms);
+    }
+
+    public function add_paymentTerm()
+    {
+        $access = $this->mt->userAccess();
+        if (!$access) {
+            redirect(base_url());
+        }
+        $data['title'] = "Add Payment Term";
+        $data['terms'] =  $this->db->query("select * from tbl_payment_term where Status = 'a'")->result();
+        $data['content'] = $this->load->view('Administrator/add_paymentTerm', $data, TRUE);
+        $this->load->view('Administrator/index', $data);
+    }
+    public function insert_paymentTerm()
+    {
+        $id = $this->input->post('id');
+        $term = $this->input->post('term');
+        if (empty($id)) {
+            $termdata = array(
+                'term'    => $term,
+                'addTime' => date("Y-m-d H:i:s"),
+                'Status'  => 'a'
+            );
+            $this->db->insert('tbl_payment_term', $termdata);
+        } else {
+            $termdata = array(
+                'term'       => $term,
+                'updateTime' => date("Y-m-d H:i:s"),
+                'Status'     => 'a'
+            );
+            $this->db->where('id', $id);
+            $this->db->update('tbl_payment_term', $termdata);
+        }
+
+        if (empty($id)) {
+            echo json_encode(['status' => true, 'msg' => 'Payment term insert']);
+        } else {
+            echo json_encode(['status' => true, 'msg' => 'Payment term update']);
+        }
+    }
+
+    public function paymentTermdelete()
+    {
+        $id = $this->input->post('id');
+        $this->db->where('id', $id);
+        $this->db->update('tbl_payment_term', ['Status' => 'd']);
+        echo json_encode(['status' => true, 'msg' => 'Payment term delete']);
+    }
 }

@@ -131,7 +131,7 @@
         </div>
         <div class="col-md-12">
             <div class="table-responsive">
-                <datatable :columns="columns" :data="damages" :filter-by="filter">
+                <datatable :columns="columns" class="table-striped" :data="damages" :filter-by="filter">
                     <template scope="{ row }">
                         <tr>
                             <td>{{ row.Damage_InvoiceNo }}</td>

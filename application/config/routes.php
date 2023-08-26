@@ -7,7 +7,10 @@ $route['translate_uri_dashes'] = FALSE;
 
 $route['logout'] = 'Login/logout';
 
-$route['services(/:any)?'] = 'Administrator/Services/index$1';
+$route['invoice/(:any)'] = 'Administrator/InvoiceController/indexInvoice/$1';
+$route['get_sales_invoice'] = 'Administrator/InvoiceController/getSalesInvoice';
+
+$route['services/(:any?)'] = 'Administrator/Services/index$1';
 $route['IMEI_number_exist_check'] = 'Administrator/Services/IMEINumberExistCheck';
 $route['add_services'] = 'Administrator/Services/addServices';
 $route['update_services'] = 'Administrator/Services/update_services';
@@ -24,6 +27,7 @@ $route['category'] = 'Administrator/Page/add_category';
 $route['insertcategory'] = 'Administrator/Page/insert_category';
 $route['catdelete'] = 'Administrator/page/catdelete';
 $route['check_imei_number'] = 'Administrator/Products/checkImeiNumber';
+$route['update_imei_number'] = 'Administrator/Products/updateImeiNumber';
 
 $route['get_brands'] = 'Administrator/Page/getBrands';
 $route['brand'] = 'Administrator/Page/add_brand';
@@ -38,7 +42,6 @@ $route['insert_varient']      = 'Administrator/Page/insertVarient';
 $route['edit_varient/(:any)'] = 'Administrator/Page/editVarient/$1';
 $route['update_varient']      = 'Administrator/Page/UpdateVarient';
 $route['delete_varient']      = 'Administrator/Page/deleteVarient';
-
 
 $route['product_ledger']    =    'Administrator/Products/productLedger';
 $route['get_product_ledger']    =    'Administrator/Products/getProductLedger';
@@ -376,6 +379,7 @@ $route['employeeUpdate'] = 'Administrator/Employee/employee_Update';
 $route['employeeDelete'] = 'Administrator/Employee/employee_Delete';
 $route['employeeActive'] = 'Administrator/Employee/active';
 $route['salarypayment'] = 'Administrator/Employee/employeesalarypayment';
+$route['salary_payment_print/(:any)'] = 'Administrator/Employee/salaryPaymentPrint/$1';
 $route['commission_payment'] = 'Administrator/Employee/commissionPayment';
 $route['get_payable_commission'] = 'Administrator/Employee/getPayableCommission';
 $route['add_employee_payment'] = 'Administrator/Employee/addEmployeePayment';
@@ -625,3 +629,8 @@ $route['add-referance'] = 'Administrator/Page/addReferance';
 $route['save-referance'] = 'Administrator/Page/saveReferance';
 $route['get-referances'] = 'Administrator/Page/getReferances';
 $route['delete-referance'] = 'Administrator/Page/deleteReferance';
+
+$route['get_payment_term'] = 'Administrator/Page/getpaymentTerm';
+$route['payment_term'] = 'Administrator/Page/add_paymentTerm';
+$route['insert_payment_term'] = 'Administrator/Page/insert_paymentTerm';
+$route['payment_term_delete'] = 'Administrator/page/paymentTermdelete';

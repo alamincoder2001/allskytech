@@ -162,11 +162,11 @@
                                     <div class="col-sm-9">
                                         <div class="row">
                                             <div class="col-sm-5">
-                                                <input type="number" id="p_d_percent" placeholder="%" ref="p_d_percent" step="0.01" min="0.00" class="form-control" v-model="Discount_percent" v-on:input="productTotal" />
+                                                <input type="number" id="p_d_percent" placeholder="%" ref="p_d_percent" step="0.01" min="0.00" class="form-control" v-model="selectedProduct.discount" v-on:input="productTotal" />
                                             </div>
                                             <label class="col-sm-2 control-label no-padding-right">Taka</label>
                                             <div class="col-sm-5">
-                                                <input type="number" id="p_d_percent_taka" placeholder="Taka" ref="p_d_percent_taka" step="0.01" min="0.00" class="form-control" v-model="selectedProduct.discount" v-on:input="productTotal" />
+                                                <input type="number" id="p_d_percent_taka" placeholder="Taka" ref="p_d_percent_taka" step="0.01" min="0.00" class="form-control" v-model="selectedProduct.discountAmount" v-on:input="productTotal" />
                                             </div>
                                         </div>
                                         <!-- <input type="text" id="quantity" placeholder="discount" class="form-control"
@@ -236,7 +236,7 @@
                                 W - {{ product.Warranty }} days</td>
                             <td>{{ product.quantity }}</td>
                             <td>{{ product.salesRate }}</td>
-                            <td>{{ product.discount }}</td>
+                            <td>{{ product.discountAmount }}</td>
                             <td>{{ product.total }}</td>
                             <td><a href="" v-on:click.prevent="removeFromCart(sl)"><i class="fa fa-trash"></i></a></td>
                         </tr>
@@ -363,6 +363,23 @@
                                     <tr>
                                         <td>
                                             <div class="form-group">
+                                                <label class="col-xs-12 control-label no-padding-right">Payment Term</label>
+                                                <div class="col-xs-10 no-padding-right">
+                                                    <select class="form-control" style="padding: 0;" v-model="quotation.payment_term">
+                                                        <option value="">Select payment term</option>
+                                                        <option v-for="(item, index) in terms" :value="item.term">{{item.term}}</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-xs-2">
+                                                    <a href="<?= base_url('payment_term') ?>" class="btn btn-xs btn-danger" style="height: 25px; border: 0; width: 27px; margin-left: -10px;" target="_blank" title="Add New Product"><i class="fa fa-plus" aria-hidden="true" style="margin-top: 5px;"></i></a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <div class="form-group">
                                                 <label class="col-sm-12 control-label no-padding-right">Total</label>
                                                 <div class="col-sm-12">
                                                     <input type="number" class="form-control" v-model="quotation.total" readonly />
@@ -413,6 +430,7 @@
                     discount: 0.00,
                     vat: 0.00,
                     total: 0.00,
+                    payment_term: '',
                     note: ''
                 },
                 Discount_percent: '',
@@ -437,7 +455,9 @@
                     Product_SellingPrice: 0.00,
                     total: 0.00,
                     discount: 0
-                }
+                },
+
+                terms: [],
             }
         },
         created() {
@@ -445,6 +465,7 @@
             this.getBranches();
             this.getProducts();
             this.getCustomers();
+            this.getPaymentTerms();
 
             if (this.quotation.quotationId != 0) {
                 this.getQuotations();
@@ -454,6 +475,11 @@
             async getCustomers() {
                 await axios.get('/get_customers').then(res => {
                     this.customers = res.data;
+                })
+            },
+            getPaymentTerms() {
+                axios.post('/get_payment_term').then(res => {
+                    this.terms = res.data;
                 })
             },
             customerOnChange() {
@@ -472,23 +498,15 @@
                 })
             },
             productTotal() {
-                console.log(this.selectedProduct);
-
                 if (event.target.id == 'p_d_percent') {
-                    this.selectedProduct.discount = (parseFloat(this.selectedProduct.Product_SellingPrice) * parseFloat(this.selectedProduct.quantity) * (parseFloat(this.Discount_percent) / 100)).toFixed(2);
-                } else {
-                    this.Discount_percent = ((parseFloat(this.selectedProduct.discount) * 100) / (parseFloat(this.selectedProduct.Product_SellingPrice) * parseFloat(this.selectedProduct.quantity))).toFixed(2)
+                    this.selectedProduct.discountAmount = parseFloat((parseFloat(this.selectedProduct.Product_SellingPrice) * parseFloat(this.selectedProduct.discount)) / 100).toFixed(2);
                 }
-
-                this.selectedProduct.total = (parseFloat(this.selectedProduct.Product_SellingPrice) * parseFloat(this.selectedProduct.quantity)) - parseFloat(this.selectedProduct.discount)
-
-
-                // this.selectedProduct.total = (parseFloat(this.selectedProduct.quantity) * parseFloat(this.selectedProduct.Product_SellingPrice)).toFixed(2);
-                // var numVal1 = (parseFloat(this.selectedProduct.quantity) * parseFloat(this.selectedProduct
-                //     .Product_SellingPrice)).toFixed(2);
-                // var numVal2 = this.selectedProduct.discount / 100;
-                // var totalValue = numVal1 - (numVal1 * numVal2)
-                // this.selectedProduct.total = totalValue.toFixed(2);
+                if (event.target.id == 'p_d_percent_taka') {
+                    this.selectedProduct.discount = parseFloat((parseFloat(this.selectedProduct.discountAmount) * 100) / parseFloat(this.selectedProduct.Product_SellingPrice)).toFixed(2);
+                }
+                let total = parseFloat(this.selectedProduct.quantity) * parseFloat(this.selectedProduct.Product_SellingPrice);
+                let discountTotal = this.selectedProduct.discountAmount == undefined ? 0 : parseFloat(this.selectedProduct.discountAmount) * this.selectedProduct.quantity;
+                this.selectedProduct.total = parseFloat(total - discountTotal).toFixed(2);
             },
             productOnChange() {
                 if (this.selectedProduct.Product_SlNo == '') {
@@ -512,7 +530,8 @@
                     salesRate: this.selectedProduct.Product_SellingPrice,
                     quantity: this.selectedProduct.quantity,
                     total: this.selectedProduct.total,
-                    discount: this.selectedProduct.discount
+                    discount: this.selectedProduct.discount,
+                    discountAmount: this.selectedProduct.discountAmount == undefined ? 0 : this.selectedProduct.discountAmount
                 }
 
 
@@ -579,7 +598,10 @@
                     parseFloat(this.quotation.discount)).toFixed(2);
             },
             saveQuotation() {
-
+                if (this.quotation.payment_term == '') {
+                    alert('Payment term is empty');
+                    return;
+                }
 
                 if (this.cart.length == 0) {
                     alert('Cart is empty');
@@ -617,20 +639,21 @@
                 axios.post('/get_quotations', {
                     quotationId: this.quotation.quotationId
                 }).then(res => {
-                    let r = res.data;
-                    let quotation = r.quotations[0];
-                    this.quotation.customerName = quotation.SaleMaster_customer_name;
-                    this.quotation.customerMobile = quotation.SaleMaster_customer_mobile;
-                    this.quotation.customerAddress = quotation.SaleMaster_customer_address;
-                    this.quotation.quotationBy = quotation.AddBy;
-                    this.quotation.invoiceNo = quotation.SaleMaster_InvoiceNo;
-                    this.quotation.salesFrom = quotation.SaleMaster_branchid;
-                    this.quotation.salesDate = quotation.SaleMaster_SaleDate;
-                    this.quotation.subTotal = quotation.SaleMaster_SubTotalAmount;
-                    this.quotation.discount = quotation.SaleMaster_TotalDiscountAmount;
-                    this.quotation.vat = quotation.SaleMaster_TaxAmount;
-                    this.quotation.total = quotation.SaleMaster_TotalSaleAmount;
-                    this.quotation.note = quotation.note;
+                    let r                              = res.data;
+                    let quotation                      = r.quotations[0];
+                        this.quotation.customerName    = quotation.SaleMaster_customer_name;
+                        this.quotation.customerMobile  = quotation.SaleMaster_customer_mobile;
+                        this.quotation.customerAddress = quotation.SaleMaster_customer_address;
+                        this.quotation.quotationBy     = quotation.AddBy;
+                        this.quotation.invoiceNo       = quotation.SaleMaster_InvoiceNo;
+                        this.quotation.salesFrom       = quotation.SaleMaster_branchid;
+                        this.quotation.salesDate       = quotation.SaleMaster_SaleDate;
+                        this.quotation.subTotal        = quotation.SaleMaster_SubTotalAmount;
+                        this.quotation.discount        = quotation.SaleMaster_TotalDiscountAmount;
+                        this.quotation.vat             = quotation.SaleMaster_TaxAmount;
+                        this.quotation.total           = quotation.SaleMaster_TotalSaleAmount;
+                        this.quotation.note            = quotation.note;
+                        this.quotation.payment_term    = quotation.payment_term;
 
                     this.vatPercent = parseFloat(this.quotation.vat) * 100 / parseFloat(this.quotation
                         .subTotal);
@@ -645,7 +668,8 @@
                             salesRate: product.SaleDetails_Rate,
                             quantity: product.SaleDetails_TotalQuantity,
                             total: product.SaleDetails_TotalAmount,
-                            discount: product.SaleDetails_Discount
+                            discount: parseFloat((parseFloat(product.SaleDetails_Discount) * 100) / parseFloat(product.SaleDetails_Rate)).toFixed(2),
+                            discountAmount: product.SaleDetails_Discount
                         }
 
                         this.cart.push(cartProduct);

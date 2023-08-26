@@ -371,7 +371,7 @@
                             <td>{{ purchase.PurchaseMaster_InvoiceNo }}</td>
                             <td>{{ purchase.PurchaseMaster_OrderDate }}</td>
                             <td>{{ purchase.Supplier_Name }}</td>
-                            <td style="text-align:right;">{{ purchase.PurchaseMaster_PaidAmount | decimal }}</td>
+                            <td style="text-align:right;">{{ purchase.PurchaseMaster_cashPaid | decimal }}</td>
                         </tr>
                     </tbody>
                     <tfoot>
@@ -689,10 +689,10 @@ new Vue({
         },
         totalPurchase() {
             return this.purchases.reduce((prev, curr) => {
-                return prev + parseFloat(curr.PurchaseMaster_PaidAmount)
+                return prev + parseFloat(curr.PurchaseMaster_cashPaid)
             }, 0).toFixed(2);
         },
-        totalReceivedFromCustomers() {
+        totalReceivedFromCustomers() {  
             return this.receivedFromCustomers.reduce((prev, curr) => {
                 return prev + parseFloat(curr.CPayment_amount)
             }, 0).toFixed(2);
@@ -804,7 +804,7 @@ new Vue({
         getPurchases() {
             axios.post('/get_purchases', this.filter)
                 .then(res => {
-                    this.purchases = res.data.purchases;
+                    this.purchases = res.data.purchases.filter(purchase => purchase.PurchaseMaster_cashPaid > 0);
                 })
         },
 
@@ -956,7 +956,7 @@ new Vue({
         getEmployeePayments() {
             axios.post('/get_employee_payments', this.filter)
                 .then(res => {
-                    this.employeePayments = res.data;
+                    this.employeePayments = res.data.filter((e) => {return e.payment_by != 'bank'});
                 })
         },
 

@@ -23,14 +23,14 @@ const quotationInvoice = Vue.component("quotation-invoice", {
                     </div>
                     <div class="col-xs-4 text-right">
                         <strong>Created by:</strong> {{ quotation.AddBy }}<br>
-                        <strong>Invoice No.:</strong> {{ quotation.SaleMaster_InvoiceNo }}<br>
-                        <strong>Date:</strong> {{ quotation.SaleMaster_SaleDate }} {{ moment(quotation.AddTime).format('h:mm a') }}
+                        <strong>Quotation No.:</strong> {{ quotation.SaleMaster_InvoiceNo }}<br>
+                        <strong>Date:</strong> {{ quotation.SaleMaster_SaleDate }} {{ moment(quotation.AddTime).format('h:mm a') }} <br>
+                        <strong>Payment Term:</strong> {{ quotation.payment_term }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-xs-12">
-                        <div _d9283dsc></div>
-                    </div>
+                   <div _d9283dsc> 
+                   </div>
                 </div>
                 <div class="row">
                     <div class="col-xs-12">
@@ -40,8 +40,10 @@ const quotationInvoice = Vue.component("quotation-invoice", {
                                     <td>Sl.</td>
                                     <td>Product</td>
                                     <td>Unit Price</td>
+                                    <td>Net Price</td>
+                                    <td style="width:10%;">G / W</td>
                                     <td>Qnty</td>
-                                    <td>Discount(%)</td>
+                                    <td>Discount</td>
                                     <td>Total</td>
                                 </tr>
                             </thead>
@@ -50,12 +52,15 @@ const quotationInvoice = Vue.component("quotation-invoice", {
                                     <td>{{ sl + 1 }}</td>
                                     <td>{{ product.Product_Name }}</td>
                                     <td>{{ product.SaleDetails_Rate }}</td>
+                                    <td>{{ parseFloat(product.SaleDetails_Rate - product.SaleDetails_Discount).toFixed(2) }}</td>
+                                    <td>G - {{ product.Guarantee }} days <br>
+                                        W - {{ product.Warranty }} days</td>
                                     <td>{{ product.SaleDetails_TotalQuantity }}</td>
                                     <td>{{ product.SaleDetails_Discount }}</td>
                                     <td align="right">{{ product.SaleDetails_TotalAmount }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="3" class="text-right">Total Qty</td>
+                                    <td colspan="5" class="text-right">Total Qty</td>
                                     <td class="text-center">{{totalQty}}</td>
                                     <td colspan="2"></td>
                                 </tr>
@@ -160,13 +165,12 @@ const quotationInvoice = Vue.component("quotation-invoice", {
                 div[_h098asdh]{
                     background-color:#e0e0e0;
                     font-weight: bold;
-                    font-size:15px;
+                    font-size:20px;
                     margin-bottom:15px;
                     padding: 5px;
                 }
                 div[_d9283dsc]{
                     padding-bottom:25px;
-                    border-bottom: 1px solid #ccc;
                     margin-bottom: 15px;
                 }
                 table[_a584de]{
@@ -185,6 +189,22 @@ const quotationInvoice = Vue.component("quotation-invoice", {
                 }
                 table[_t92sadbc2] td{
                     padding: 2px;
+                }
+
+                .logo{
+                    width: 30%;
+                    float:left;
+                    overflow:hidden;
+                }
+
+                .logo img{
+                    margin-left:55px;
+                }
+
+                .heading {
+                    width: 70%;
+                    float:left;
+                    padding-top:25px;
                 }
             `;
       document.head.appendChild(this.style);
@@ -214,10 +234,10 @@ const quotationInvoice = Vue.component("quotation-invoice", {
                 <body>
                     <div class="container">
                         <div class="row">
-                            <div class="col-xs-2"><img src="/uploads/company_profile_thum/${
+                            <div class="logo"><img src="/uploads/company_profile_thum/${
                               this.currentBranch.Company_Logo_thum
-                            }" alt="Logo" style="height:80px;" /></div>
-                            <div class="col-xs-10" style="padding-top:20px;">
+                            }" alt="Logo" style="height:138px; width:170px;" /></div>
+                            <div class="heading">
                             <span style="font-size:18px;">AALL SKY TECH LTD</span><br>
                                 <span style="font-size:18px;">${
                                   this.currentBranch.Company_Name
@@ -225,11 +245,7 @@ const quotationInvoice = Vue.component("quotation-invoice", {
                                 ${this.currentBranch.Repot_Heading}
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <div style="border-bottom: 4px double #454545;margin-top:7px;margin-bottom:7px;"></div>
-                            </div>
-                        </div>
+        
                     </div>
                     <div class="container">
                         <div class="row">
@@ -253,9 +269,6 @@ const quotationInvoice = Vue.component("quotation-invoice", {
                                 Print Date: ${moment().format(
                                   "DD-MM-YYYY h:mm a"
                                 )}, Printed by: ${this.quotation.AddBy}
-                            </div>
-                            <div class="col-xs-6 text-right">
-                                Developed by: Link-Up Technologoy, Contact no: 01911978897
                             </div>
                         </div>
                     </div>

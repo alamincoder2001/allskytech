@@ -186,7 +186,12 @@
 
                                     <tr v-for="(imei, sl) in imeis">
                                         <td>{{sl+1}}</td>
-                                        <td>{{imei.ps_imei_number}}</td>
+                                        <td v-if="imei.is_edit">
+                                            <input type="text" v-model="imei.ps_imei_number">
+                                            <a href="" v-on:click.prevent="updateIMEI(imei)"><i class="fa fa-check-square"></i></a>
+                                        </td>
+                                        <td v-else>{{imei.ps_imei_number}} <a href="" v-on:click.prevent="editIMEI(imei)"><i class="fa fa-pencil"></i></a></td>
+
                                         <td> {{imei.Product_Name}}</td>
                                         <td> {{imei.purchase_date}}</td>
                                     </tr>
@@ -240,51 +245,133 @@
         </div>
     </div>
     <div class="row" v-if="searchType != null" style="display:none" v-bind:style="{display: searchType == null ? 'none' : ''}">
-        <div class="col-md-12">
+        <div class="col-md-6">
             <a href="" v-on:click.prevent="print"><i class="fa fa-print"></i> Print</a>
         </div>
+
+        <div class="col-md-6">
+            <div class="form-group" style="width:30%; display:none; float:right;" v-if="searchType == 'current'" v-bind:style="{display: searchType == 'current' ? '' : 'none'}">
+                <label for="filter" class="sr-only">Filter</label>
+                <input type="text" class="form-control" v-model="currentStock.filter" placeholder="Search Record">
+            </div>
+
+            <div class="form-group" v-if="searchType != 'current' && searchType != null" style="display:none; width:30%; float:right;" :style="{display: searchType != 'current' && searchType != null ? '' : 'none'}">
+                <label for="filter" class="sr-only">Filter</label>
+                <input type="text" class="form-control" v-model="totalStock.filter" placeholder="Search Record">
+            </div>
+
+        </div>
+
     </div>
     <div class="row">
         <div class="col-md-12">
             <div class="table-responsive" id="stockContent">
-                <table class="table table-bordered" v-if="searchType == 'current'" style="display:none" v-bind:style="{display: searchType == 'current' ? '' : 'none'}">
-                    <thead>
+
+                <datatable :columns="columns" class="table-striped" :data="stock" :filter-by="currentStock.filter" v-if="searchType == 'current'" style="display:none; margin-bottom:0 " v-bind:style="{display: searchType == 'current' ? '' : 'none'}">
+                    <template scope="{ row }">
                         <tr>
-                            <th>Product Id</th>
-                            <th>Product Name</th>
-                            <th>Category</th>
-                            <th>Current Quantity</th>
-                            <th>Stock Value</th>
-                            <th>Serial</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="product in stock">
-                            <td>{{ product.Product_Code }}</td>
-                            <td>{{ product.Product_Name }}</td>
-                            <td>{{ product.ProductCategory_Name }}</td>
-                            <td>{{ product.current_quantity }} {{ product.Unit_Name }}</td>
-                            <td>{{ product.purchase_total_am }}</td>
+                            <td>{{ row.Product_Code }}</td>
+                            <td>{{ row.Product_Name }}</td>
+                            <td>{{ row.ProductCategory_Name }}</td>
+                            <td>{{ row.current_quantity }}</td>
+                            <td>{{ row.purchase_total_am }}</td>
                             <td>
-                                <button v-if="product.Is_Serial == 'true'" type="button" class="button edit" @click="viewIMEI(product.product_id)">
+                                <button v-if="row.Is_Serial == 'true'" type="button" class="button edit" @click="viewIMEI(row.product_id)">
                                     <i class="fa fa-eye"></i>
                                 </button>
                             </td>
                         </tr>
-                    </tbody>
-                    <tfoot>
+                    </template>
+                </datatable>
+
+                <div style="width:100%; float:right; margin-top:0">
+                    <table border="1" style="width: 100%; border-color:#eaeaea; display:none" cellspadding="0" v-if="searchType == 'current'" style="display:none" v-bind:style="{display: searchType == 'current' ? '' : 'none'}">
                         <tr>
-                            <td colspan="3" style="text-align:right;">Total Stock Value</td>
-
-                            <td>{{ stock.reduce((prev,curr) => {return +prev + +curr.current_quantity},0)}}</td>
-                            <td>{{ stock.reduce((prev,curr) => {return +prev + +curr.purchase_total_am},0)}}</td>
-                            <td>
-                            <td>
+                            <td style="text-align:right; width:58%; font-weight:bold;">Total Stock Value</td>
+                            <td style="text-align:center; width:21%;">
+                                {{ stock.reduce((prev,curr) => {return +prev + +curr.current_quantity},0)}}
+                            </td>
+                            <td style="text-align:center; width:21%;">
+                                {{ stock.reduce((prev,curr) => {return +prev + +curr.purchase_total_am},0)}}
+                            </td>
                         </tr>
-                    </tfoot>
-                </table>
+                    </table>
+                </div>
 
-                <table class="table table-bordered" v-if="searchType != 'current' && searchType != null" style="display:none;" :style="{display: searchType != 'current' && searchType != null ? '' : 'none'}">
+                <datatable-pager v-model="page" type="abbreviated" :per-page="per_page" style="margin-bottom: 50px; display:none" v-if="searchType == 'current'" v-bind:style="{display: searchType == 'current' ? '' : 'none'}"></datatable-pager>
+
+
+                <datatable :columns="allColumns" class="table-striped" :data="stock" :filter-by="totalStock.filter" v-if="searchType != 'current' && searchType != null" style="display:none; margin-bottom:0" :style=" {display: searchType != 'current' && searchType != null ? '' : 'none'}">
+                    <template scope="{ row }">
+                        <tr>
+                            <td>{{ row.Product_Code }}</td>
+                            <td>{{ row.Product_Name }}</td>
+                            <td>{{ row.ProductCategory_Name }}</td>
+                            <td>{{ row.purchased_quantity }}</td>
+                            <td>{{ row.purchase_returned_quantity }}</td>
+                            <td>{{ row.damaged_quantity }}</td>
+                            <td>{{ row.sold_quantity }}</td>
+                            <td>{{ row.sales_returned_quantity }}</td>
+                            <td>{{ row.transfered_to_quantity }}</td>
+                            <td>{{ row.transfered_from_quantity }}</td>
+                            <td>{{ row.current_quantity }}</td>
+                            <td>{{ row.purchase_total_am }}</td>
+                            <td>
+                                <button v-if="row.Is_Serial == 'true'" type="button" class="button edit" @click="viewIMEI(row.Product_SlNo)">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </template>
+                </datatable>
+
+                <div style="width:100%;">
+                    <table border="1" style="width: 100%; border-color:#eaeaea; display:none" cellspadding="0" v-if="searchType != 'current' && searchType != null" :style=" {display: searchType != 'current' && searchType != null ? '' : 'none'}">
+                        <tr>
+                            <td style="text-align:center; width:22%; font-weight:bold;">Total </td>
+                            <td style="text-align:center; width:7%;">
+                                {{ stock.reduce((prev,curr) => {return +prev + +curr.purchased_quantity},0)}}
+                            </td>
+
+                            <td style="text-align:center; width:8%;">
+                                {{ stock.reduce((prev,curr) => {return +prev + +curr.purchase_returned_quantity},0)}}
+                            </td>
+
+                            <td style="text-align:center; width:6%;">
+                                {{ stock.reduce((prev,curr) => {return +prev + +curr.damaged_quantity},0)}}
+                            </td>
+
+                            <td style="text-align:center; width:7%;">
+                                {{ stock.reduce((prev,curr) => {return +prev + +curr.sold_quantity},0)}}
+                            </td>
+
+                            <td style="text-align:center; width:7%;">
+                                {{ stock.reduce((prev,curr) => {return +prev + +curr.sales_returned_quantity},0)}}
+                            </td>
+
+                            <td style="text-align:center; width:7%;">
+                                {{ stock.reduce((prev,curr) => {return +prev + +curr.transfered_to_quantity},0)}}
+                            </td>
+
+                            <td style="text-align:center; width:7%;">
+                                {{ stock.reduce((prev,curr) => {return +prev + +curr.transfered_from_quantity},0)}}
+                            </td>
+
+                            <td style="text-align:center; width:7%;">
+                                {{ stock.reduce((prev,curr) => {return +prev + +curr.current_quantity},0)}}
+                            </td>
+
+                            <td style="text-align:center; width:7%;">
+                                {{ stock.reduce((prev,curr) => {return +prev + +curr.purchase_total_am},0)}}
+                            </td>
+
+                        </tr>
+                    </table>
+                </div>
+
+                <datatable-pager v-model="page" type="abbreviated" :per-page="per_page" v-if="searchType != 'current' && searchType != null" style="display:none;" :style=" {display: searchType != 'current' && searchType != null ? '' : 'none'}"></datatable-pager>
+
+                <!-- <table class="table table-bordered" v-if="searchType != 'current' && searchType != null" style="display:none;" :style=" {display: searchType != 'current' && searchType != null ? '' : 'none'}">
                     <thead>
                         <tr>
                             <th>Product Id</th>
@@ -338,7 +425,7 @@
                             <td></td>
                         </tr>
                     </tfoot>
-                </table>
+                </table> -->
             </div>
         </div>
     </div>
@@ -346,6 +433,7 @@
 
 <script src="<?php echo base_url(); ?>assets/js/vue/vue.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/vue/axios.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/vuejs-datatable.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/vue/vue-select.min.js"></script>
 
 <script>
@@ -379,7 +467,116 @@
                     text: 'select',
                     value: ''
                 },
+                columns: [{
+                        label: 'Product Id',
+                        field: 'Product_Code',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Product Name',
+                        field: 'Product_Name',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Product Category',
+                        field: 'ProductCategory_Name',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Current Quantity',
+                        field: 'current_quantity',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Stock Value',
+                        field: 'purchase_total_am',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Serial',
+                        align: 'center',
+                        filterable: false
+                    }
+                ],
+
+                allColumns: [{
+                        label: 'Product Id',
+                        field: 'Product_Code',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Product Name',
+                        field: 'Product_Name',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Product Category',
+                        field: 'ProductCategory_Name',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Purchased Quantity',
+                        field: 'purchased_quantity',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Purchase Returned Quantity',
+                        field: 'purchase_returned_quantity',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Damaged Quantity',
+                        field: 'damaged_quantity',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Sold Quantity',
+                        field: 'sold_quantity',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Sales Returned Quantity',
+                        field: 'sales_returned_quantity',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Transfered In Quantity',
+                        field: 'transfered_to_quantity',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Transfered Out Quantity',
+                        field: 'transfered_from_quantity',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Current Quantity',
+                        field: 'current_quantity',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Stock Value',
+                        field: 'purchase_total_am',
+                        align: 'center'
+                    },
+                    {
+                        label: 'Serial',
+                        align: 'center',
+                        filterable: false
+                    }
+                ],
+                page: 1,
+                per_page: 10,
+                currentStock: {
+                    filter: '',
+                },
+
+                totalStock: {
+                    filter: '',
+                },
+
                 searchType: null,
+
                 categories: [],
                 selectedCategory: null,
                 products: [],
@@ -391,11 +588,33 @@
                 stock: [],
                 imeis: [],
                 totalStockValue: 0.00,
-                current_quantity: 0
+                current_quantity: 0,
+                isEdit: false,
             }
         },
         created() {},
         methods: {
+            editIMEI(data) {
+                let index = this.imeis.findIndex(p => p.ps_id == data.ps_id)
+                this.imeis[index].is_edit = true;
+                // console.log(data, this.imeis);
+            },
+            updateIMEI(data) {
+                axios.post('/update_imei_number', {
+                        ps_id: data.ps_id,
+                        productId: data.ps_prod_id,
+                        serial: data.ps_imei_number,
+                    })
+                    .then((res) => {
+                        alert(res.data.message);
+                        if (res.data.success) {
+                            this.viewIMEI(data.ps_prod_id);
+                        }
+                    });
+
+
+
+            },
             serialShowModal() {
 
                 this.serialModalStatus = true;
@@ -464,7 +683,10 @@
                         prod_id: prod_id
                     })
                     .then((res) => {
-                        this.imeis = res.data;
+                        this.imeis = res.data.map(p => {
+                            p.is_edit = false
+                            return p;
+                        });
                     });
                 this.serialShowModal();
             },
