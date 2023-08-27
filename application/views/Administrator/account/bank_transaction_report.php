@@ -111,16 +111,16 @@
                             <td>{{ transaction.account_number }}</td>
                             <td>{{ transaction.bank_name }}</td>
                             <td>{{ transaction.note }}</td>
-                            <td style="text-align:right">{{ transaction.transaction_type == 'deposit' ? transaction.amount : '' }}</td>
-                            <td style="text-align:right">{{ transaction.transaction_type == 'withdraw' ? transaction.amount : '' }}</td>
+                            <td style="text-align:right">{{ transaction.transaction_type == 'deposit' ? transaction.deposit : '' }}</td>
+                            <td style="text-align:right">{{ transaction.transaction_type == 'withdraw' ? transaction.withdraw : '' }}</td>
                         </tr>
                     </tbody>
 
                     <tfoot>
                         <tr style="font-weight:bold;">
                             <td colspan="7" style="text-align:right;">Total &nbsp;</td>
-                            <td style="text-align:right;">{{ totalDeposit = this.transactions.filter(t => t.transaction_type == 'deposit').reduce((prev, curr) => { return prev + parseFloat(curr.amount)}, 0) }}</td>
-                            <td style="text-align:right;">{{ totalWithdraw = this.transactions.filter(t => t.transaction_type == 'withdraw').reduce((prev, curr) => { return prev + parseFloat(curr.amount)}, 0) }}</td>
+                            <td style="text-align:right;">{{ totalDeposit = this.transactions.filter(t => t.transaction_type == 'deposit').reduce((prev, curr) => { return prev + parseFloat(curr.deposit)}, 0) }}</td>
+                            <td style="text-align:right;">{{ totalWithdraw = this.transactions.filter(t => t.transaction_type == 'withdraw').reduce((prev, curr) => { return prev + parseFloat(curr.withdraw)}, 0) }}</td>
                         </tr>
                     </tfoot>
                 </table>
