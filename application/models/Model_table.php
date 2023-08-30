@@ -676,6 +676,40 @@ class Model_Table extends CI_Model
         return TRUE;
     }
 
+    //assetReport
+
+    public function assetsReport($clauses = '', $date = null)
+    {
+        $branchId = $this->session->userdata('BRANCHid');
+
+        $assets = $this->db->query("
+            SELECT a.as_name as group_name,
+            ( SELECT ifnull( sum(as_qty) , 0) 
+                from tbl_assets
+                where as_name = a.as_name
+                and status = 'a'
+                and branchid = '$branchId'
+                " . ($date == null ? "" : " and as_date < '$date'") . "
+            ) as purchase_qty,
+
+            ( SELECT ifnull( sum(as_amount) , 0) 
+                from tbl_assets
+                where as_name = a.as_name
+                and status = 'a'
+                and branchid = '$branchId'
+                " . ($date == null ? "" : " and as_date < '$date'") . "
+            ) as purchase_amount
+
+            from tbl_assets as a
+            where a.status = 'a'
+            and a.branchid = '$branchId'
+            $clauses
+            group by as_name
+        ")->result();
+
+        return $assets;
+    }
+
 
     //Loan 
 

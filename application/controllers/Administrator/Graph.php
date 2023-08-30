@@ -195,6 +195,10 @@
                 return $bank->balance;
             }, $loanTransactions));
 
+            //Assets Value
+            $assets = $this->mt->assetsReport();
+            $assets_value = array_reduce($assets, function($prev, $curr){ return $prev + $curr->purchase_amount;});
+
             //stock value
             $stocks = $this->mt->currentStock();
 
@@ -344,6 +348,7 @@
                 'customer_due'      => $customerDue,
                 'supplier_due'      => $supplierDue,
                 'bank_balance'      => $bankBalance,
+                'asset_value'       => $assets_value,
                 'invest_balance'    => $investBalance,
                 'loan_balance'      => $loanBalance,
                 'stock_value'       => $stockValue,
@@ -353,4 +358,3 @@
             echo json_encode($responseData, JSON_NUMERIC_CHECK);
         }
     }
-?>
